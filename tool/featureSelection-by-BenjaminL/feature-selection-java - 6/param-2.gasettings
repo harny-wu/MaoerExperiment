@@ -1,0 +1,15 @@
+[GA]\ Population=20
+[GA]\ Chromosome\ switch\ number=0.5
+[GA]\ Chromosome\ reserve\ number=0.5
+[GA]\ Max\ Iteration=600
+[GA]\ Max\ Convergence=5
+[GA]\ Max\ Fitness=auto
+[GA]\ Max\ distinct\ Best\ Fitness=auto
+[GA]\ Gene\ Mutate\ Rate=0.1
+[GA]\ Gene\ Mutate\ Number=1.0
+[option][GA]\ Chromosome\ initialization=NumericGeneChromosomeInitialization
+[input][GA]\ Chromosome\ initialization=0.05
+[option][GA]\ Gene\ mutation=NumericChromosomeRandomMutation
+[option][GA]\ Gene\ cross\ algorithm=ReverseSequenceChromosomeCross
+
+#[option][GA]\ Feature\ Selection\ Method=[REC]\ (R)S(C)-REC

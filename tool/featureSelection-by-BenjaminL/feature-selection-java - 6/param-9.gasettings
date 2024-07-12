@@ -1,0 +1,16 @@
+[option][GA]\ Feature\ Selection\ Method=[I-NEC]
+[GA]\ Population=10
+[GA]\ Chromosome\ switch\ number=0.05
+[GA]\ Chromosome\ reserve\ number=0.8
+[GA]\ Max\ Iteration=300
+[GA]\ Max\ Convergence=5
+[GA]\ Max\ Fitness=auto
+[GA]\ Max\ distinct\ Best\ Fitness=auto
+[GA]\ Gene\ Mutate\ Rate=0.001
+[GA]\ Gene\ Mutate\ Number=0.1
+[option][GA]\ Chromosome\ initialization=NumericGeneChromosomeInitialization
+[input][GA]\ Chromosome\ initialization=0.001
+[option][GA]\ Gene\ mutation=NumericChromosomeRandomMutation
+[option][GA]\ Gene\ cross\ algorithm=ReverseSequenceChromosomeCross
+[option][GA]\ Single\ solution\ only=false
+[option][GA]\ Chromosome\ to\ reducts=SkipInspectionProcedureContainer

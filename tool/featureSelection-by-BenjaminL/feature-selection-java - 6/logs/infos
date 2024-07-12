@@ -1,0 +1,85 @@
+2024-07-06 20:18:51.995 [main] INFO  f.FeatureSelectionFrontApplication - 55  - Starting FeatureSelectionFrontApplication v0.0.1-SNAPSHOT on DAIDAIWU-MB0 with PID 22865 (/Users/daidaiwu/Downloads/featureSelection-by-BenjaminL/feature-selection-java - 6/featureSelectionFront-0.0.1-SNAPSHOT.jar started by daidaiwu in /Users/daidaiwu/Downloads/featureSelection-by-BenjaminL/feature-selection-java - 6)
+2024-07-06 20:18:52.001 [main] INFO  f.FeatureSelectionFrontApplication - 655 - The following profiles are active: develop
+2024-07-06 20:18:52.955 [main] INFO  o.s.s.c.ThreadPoolTaskExecutor - 181 - Initializing ExecutorService 'clientInboundChannelExecutor'
+2024-07-06 20:18:52.958 [main] INFO  o.s.s.c.ThreadPoolTaskExecutor - 181 - Initializing ExecutorService 'clientOutboundChannelExecutor'
+2024-07-06 20:18:52.972 [main] INFO  o.s.s.c.ThreadPoolTaskScheduler - 181 - Initializing ExecutorService 'messageBrokerTaskScheduler'
+2024-07-06 20:18:53.034 [MessageBroker-1] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - 126 - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 2, active threads = 1, queued tasks = 0, completed tasks = 0]
+2024-07-06 20:18:54.789 [main] INFO  o.s.s.c.ThreadPoolTaskExecutor - 181 - Initializing ExecutorService 'brokerChannelExecutor'
+2024-07-06 20:18:55.148 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - 137 - Starting...
+2024-07-06 20:18:55.149 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - 137 - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [DefaultSubscriptionRegistry[cache[0 destination(s)], registry[0 sessions]]]]
+2024-07-06 20:18:55.150 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - 137 - Started.
+2024-07-06 20:18:55.151 [main] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.172 [main] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1802 - Broker not available; cannot force queue declarations during start: java.net.ConnectException: Connection refused (Connection refused)
+2024-07-06 20:18:55.184 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.200 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.202 [main] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.203 [main] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1802 - Broker not available; cannot force queue declarations during start: java.net.ConnectException: Connection refused (Connection refused)
+2024-07-06 20:18:55.204 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.206 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.207 [main] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.208 [main] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1802 - Broker not available; cannot force queue declarations during start: java.net.ConnectException: Connection refused (Connection refused)
+2024-07-06 20:18:55.209 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.211 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.212 [main] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.213 [main] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1802 - Broker not available; cannot force queue declarations during start: java.net.ConnectException: Connection refused (Connection refused)
+2024-07-06 20:18:55.214 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#3-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.216 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#3-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.217 [main] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.218 [main] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1802 - Broker not available; cannot force queue declarations during start: java.net.ConnectException: Connection refused (Connection refused)
+2024-07-06 20:18:55.219 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#4-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.221 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#4-1] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:18:55.239 [main] INFO  f.FeatureSelectionFrontApplication - 61  - Started FeatureSelectionFrontApplication in 3.866 seconds (JVM running for 9.601)
+2024-07-06 20:19:00.276 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-1] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@52f27fbd: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:00.278 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:00.280 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:00.293 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#4-1] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@70cf32e3: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:00.293 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@312aa7c: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:00.293 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@4d0d9fe7: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:00.293 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#3-1] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@72bc6553: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:00.295 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#4-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:00.313 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:00.314 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:00.315 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#3-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:00.316 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:00.317 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:00.318 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#4-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:00.319 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#3-2] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.350 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-2] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@4c06c953: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:05.352 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.354 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.385 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-2] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@4535167f: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:05.385 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-2] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@53310fbe: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:05.386 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.387 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.388 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.389 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.400 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#3-2] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@37fd27cc: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:05.400 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#4-2] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1437 - Restarting Consumer@4aa9b111: tags=[[]], channel=null, acknowledgeMode=MANUAL local queue size=0
+2024-07-06 20:19:05.400 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#3-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.401 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#4-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.402 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#3-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:05.403 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#4-3] INFO  o.s.a.r.c.CachingConnectionFactory - 558 - Attempting to connect to: [localhost:5672]
+2024-07-06 20:19:09.314 [SpringContextShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - 137 - Stopping...
+2024-07-06 20:19:09.314 [SpringContextShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - 137 - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [DefaultSubscriptionRegistry[cache[0 destination(s)], registry[0 sessions]]]]
+2024-07-06 20:19:09.315 [SpringContextShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - 137 - Stopped.
+2024-07-06 20:19:09.315 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 646 - Waiting for workers to finish.
+2024-07-06 20:19:09.316 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 649 - Successfully waited for workers to finish.
+2024-07-06 20:19:09.316 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 646 - Waiting for workers to finish.
+2024-07-06 20:19:09.316 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 649 - Successfully waited for workers to finish.
+2024-07-06 20:19:09.316 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 646 - Waiting for workers to finish.
+2024-07-06 20:19:09.316 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 649 - Successfully waited for workers to finish.
+2024-07-06 20:19:09.316 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 646 - Waiting for workers to finish.
+2024-07-06 20:19:09.316 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 649 - Successfully waited for workers to finish.
+2024-07-06 20:19:09.317 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 646 - Waiting for workers to finish.
+2024-07-06 20:19:09.317 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 649 - Successfully waited for workers to finish.
+2024-07-06 20:19:09.320 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1260 - Shutdown ignored - container is not active already
+2024-07-06 20:19:09.320 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1260 - Shutdown ignored - container is not active already
+2024-07-06 20:19:09.321 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1260 - Shutdown ignored - container is not active already
+2024-07-06 20:19:09.321 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1260 - Shutdown ignored - container is not active already
+2024-07-06 20:19:09.321 [SpringContextShutdownHook] INFO  o.s.a.r.l.SimpleMessageListenerContainer - 1260 - Shutdown ignored - container is not active already
+2024-07-06 20:19:09.321 [SpringContextShutdownHook] INFO  o.s.s.c.ThreadPoolTaskExecutor - 218 - Shutting down ExecutorService 'brokerChannelExecutor'
+2024-07-06 20:19:09.321 [SpringContextShutdownHook] INFO  f.f.w.c.ExecutionController4Websocket - 383 - Shutting down ThreadPoolExecutor 'ExecutionController4FeatureReduction.threadPoolExecutor'
+2024-07-06 20:19:09.324 [SpringContextShutdownHook] INFO  f.f.w.c.ExecutionController4RabbitMQ - 2028 - Shutting down ThreadPoolExecutor 'ExecutionController4RabbitMQ.threadPoolExecutor'
+2024-07-06 20:19:09.326 [SpringContextShutdownHook] INFO  o.s.s.c.ThreadPoolTaskExecutor - 218 - Shutting down ExecutorService 'clientInboundChannelExecutor'
+2024-07-06 20:19:09.327 [SpringContextShutdownHook] INFO  o.s.s.c.ThreadPoolTaskExecutor - 218 - Shutting down ExecutorService 'clientOutboundChannelExecutor'
+2024-07-06 20:19:09.327 [SpringContextShutdownHook] INFO  o.s.s.c.ThreadPoolTaskScheduler - 218 - Shutting down ExecutorService 'messageBrokerTaskScheduler'
