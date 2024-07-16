@@ -4871,7 +4871,7 @@ left join 0101_0131_sound_feature t3 on t1.sound_id=t3.sound_id
 left join 0101_0131_user_feature  t4 on t1.user_id=t4.user_id
 left join 0101_0131_drama_feature t5 on t1.drama_id=t5.drama_id
 left join maoer_data_analysis.feat_sound_opensmile384_new t6 on t1.sound_id=t6.sound_id
-where t2.user_in_drama_sound_pay_type=1 # 付费
+where t2.user_in_drama_sound_pay_type=1; # 付费
 
 
 
@@ -4943,7 +4943,7 @@ select user_id,drama_id,user_in_drama_sound_pay_type from 0201_0215_user_sound_f
 group by t3.user_id,t3.drama_id
 )t2 on t1.user_id=t2.user_id and t1.drama_id=t2.drama_id
 set
-t1.user_in_drama_is_pay_for_drama_in_next_time =(case when t2.drama_info_pay_type=0 then 0 when t2.drama_info_pay_type=1 and t2.user_in_drama_is_pay_for_drama>=1 then 1 when t2.drama_info_pay_type=2 and t2.user_in_drama_is_pay_for_drama>=1 then 1 else 2 end )
+t1.user_in_drama_is_pay_for_drama_in_next_time =(case when t2.drama_info_pay_type=0 then 0 when t2.drama_info_pay_type=1 and t2.user_in_drama_is_pay_for_drama>=1 then 1 when t2.drama_info_pay_type=2 and t2.user_in_drama_is_pay_for_drama>=1 then 1 else 2 end );
 
 -- k*(q*当前弹幕前8s的契合度+(1-q)*当前归一化后前8s弹幕数量)+(1-k)*(q*当前弹幕后8s的契合度+(1-q)*当前归一化后后8s弹幕数量) 
 -- k_1/2/3表示k=0.3,0.5,0.7,q_1/2/3表示q=0.3,0.5,0.7
@@ -4998,7 +4998,7 @@ from (
   from danmu_involved_activeuser_202211_202303_allinfo
 ) as t6 on 1=1
 ) as t1
-group by t1.user_id,t1.sound_id
+group by t1.user_id,t1.sound_id;
 
 -- 得到弹幕契合度之后根据之前的表生成新数据集
 create table 0101_0131_all_feature_involved_new as 
@@ -5306,7 +5306,7 @@ left join 0101_0131_user_feature  t4 on t1.user_id=t4.user_id
 left join 0101_0131_drama_feature t5 on t1.drama_id=t5.drama_id
 left join maoer_data_analysis.feat_sound_opensmile384_new t6 on t1.sound_id=t6.sound_id
 left join active_drama_gpt_final_result t7 on t1.drama_id=t7.drama_id
-where t2.user_in_drama_sound_pay_type=1 # 付费
+where t2.user_in_drama_sound_pay_type=1; # 付费
 
 
 -- -- 生成用户消费预测数据集
@@ -5405,7 +5405,7 @@ where user_in_drama_sound_pay_type=1
 group by user_id,user_in_drama_is_pay_for_drama_in_next_time,user_in_drama_sound_pay_type
 ) t
 group by user_id
-having num>1
+having num>1;
 
 create table 1215_0115_user_pay_pred_feature
 select t1.user_id,t1.sound_id as sound_id_id,t1.drama_id,
