@@ -31,18 +31,18 @@ alter table 0201_0208_user_sound_feature
     add COLUMN user_in_sound_submit_danmu_max_len                            int(11),
     add COLUMN user_in_sound_submit_danmu_min_len                            int(11),
     add COLUMN user_in_sound_submit_danmu_avg_len                            double,
-    add COLUMN user_in_sound_submit_danmu_num                                int(11) COMMENT "用户是否弹幕数量",
+    add COLUMN user_in_sound_submit_danmu_num                                int(11) COMMENT "用户发送弹幕数量",
     add COLUMN user_in_sound_danmu_around_15s_total_danmu_max_num            int(11),
     add COLUMN user_in_sound_danmu_around_15s_total_danmu_min_num            int(11),
     add COLUMN user_in_sound_danmu_around_15s_total_danmu_avg_num            double,
     add COLUMN user_in_drama_total_review_num                                int(11),
     add COLUMN user_in_drama_total_danmu_num                                 int(11),
-    add COLUMN user_in_drama_is_pay_for_drama                                int(1),
+    add COLUMN user_in_drama_is_pay_for_drama                                int(1) COMMENT "用户是否为剧集付费",
     add COLUMN user_in_drama_is_in_drama_fans_reward                         int(1),
     add COLUMN user_in_drama_fans_reward_total_coin                          int(11),
     add COLUMN user_in_drama_is_follower_upuser                              int(1),
     ADD COLUMN user_in_drama_sound_pay_type                                  INT(1),
-    add COLUMN drama_info_pay_type                                           int(1) COMMENT "声音付费类型",
+    add COLUMN drama_info_pay_type                                           int(1) COMMENT "剧集付费类型",
     add COLUMN sound_info_pay_type                                           int(1) COMMENT "声音付费类型",
     add COLUMN user_in_drama_is_pay_for_drama_in_next_time                   int(1);
 
@@ -141,20 +141,20 @@ update 0201_0208_user_sound_feature t1 join
             sum(user_in_sound_submit_danmu_num)     as user_in_drama_total_danmu_num
      from 0201_0208_user_sound_feature t3
      group by t3.user_id, t3.drama_id) t2 on t1.user_id = t2.user_id and t1.drama_id = t2.drama_id
-set t1.user_in_drama_total_review_num = t2.user_in_drama_total_review_num,
-    t1.user_in_drama_total_danmu_num  = t2.user_in_drama_total_danmu_num;
+set t1.user_in_drama_total_review_num = t2.user_in_drama_total_review_num, # 22
+    t1.user_in_drama_total_danmu_num  = t2.user_in_drama_total_danmu_num; # 23
 
 
---
+
 update 0201_0208_user_sound_feature t1 left join
     (select drama_id, drama_info_pay_type, drama_info_need_pay
      from maoer.drama_info_update
      group by drama_id) t2 on t1.drama_id = t2.drama_id
-set t1.drama_info_pay_type=t2.drama_info_pay_type;
+set t1.drama_info_pay_type=t2.drama_info_pay_type; # 24
 
 update 0201_0208_user_sound_feature t1 left join
     (select sound_id, sound_info_pay_type from maoer.sound_info group by sound_id) t3 on t1.sound_id = t3.sound_id
-set t1.sound_info_pay_type=t3.sound_info_pay_type;
+set t1.sound_info_pay_type=t3.sound_info_pay_type; # 25
 
 update 0201_0208_user_sound_feature
 set user_in_drama_sound_pay_type = (case
@@ -162,9 +162,8 @@ set user_in_drama_sound_pay_type = (case
                                         when drama_info_pay_type = 2 and sound_info_pay_type = 0 then 1
                                         when drama_info_pay_type = 2 and sound_info_pay_type = 2 then 2
                                         when drama_info_pay_type = 1 and sound_info_pay_type = 0 then 1
-                                        when drama_info_pay_type = 1 and sound_info_pay_type = 1 then 2 end);
+                                        when drama_info_pay_type = 1 and sound_info_pay_type = 1 then 2 end); # 26
 
---
 update 1101_1130_user_sound_feature t1 join (select t3.user_id,
                                                     t3.drama_id,
                                                     t3.drama_info_pay_type,
