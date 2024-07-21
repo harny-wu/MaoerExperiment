@@ -6,46 +6,13 @@ import chardet
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
-from sklearn.impute import SimpleImputer
 
-dataset_path = '../../../data/'
-data_name = "0101_0131_all_feature_involved.csv"
-goal_encoding = 'utf-8'
-
-
-def detect_file_encoding(file_path):
-    with open(file_path, "rb") as file:
-        # 读取文件的前 N 个字节（默认为 4096）
-        raw_data = file.read(40960)
-
-    # 使用 chardet.detect() 函数检测编码
-    result = chardet.detect(raw_data)
-    return result["encoding"]
-
-
-encoding = detect_file_encoding(dataset_path + data_name)
-print(f"The detected encoding of {dataset_path + data_name} is: {encoding}")
-
-no_need_col = [
-    "sound_id", "user_id", "drama_id", "user_in_drama_is_pay_for_drama_in_next_time"
-]
-
-# 决策属性
-D = ["all_8_sim", "all_15_sim",
-     "k_1_8s_sim", "k_2_8s_sim", "k_3_8s_sim", "k_1_15s_sim", "k_2_15s_sim", "k_3_15s_sim",
-     "k_2_8s_sim_q_1_num", "k_2_8s_sim_q_2_num", "k_2_8s_sim_q_3_num", "k_2_15s_sim_q_1_num", "k_2_15s_sim_q_2_num",
-     "k_2_15s_sim_q_3_num",
-     "pay_FS", "pay_DL"]
-
-
-# 判断列是否是连续
-def is_continuous(series):
-    return any('.' in str(value) for value in series.dropna())
+from common import base_path, goal_encoding, no_need_col, D, is_continuous, data_name
 
 
 # 划分数据类型，连续与离散,并写入文件
 def col_type_divide():
-    df = pd.read_csv(dataset_path + data_name, na_values=['NULL', 'NaN', 'N/A', 'NA', ''], encoding=encoding)
+    df = pd.read_csv(base_path + data_name, na_values=['NULL', 'NaN', 'N/A', 'NA', ''], encoding=encoding)
     col_map = {
         "discrete": [],
         "continues": []
@@ -70,7 +37,7 @@ def col_type_divide():
         json_file.write(json_str)
 
     df_rename = df.rename(columns=new_col_name_map)
-    new_full_path = dataset_path + data_name.replace(".csv", "_divideType.csv")
+    new_full_path = base_path + data_name.replace(".csv", "_divideType.csv")
     df_rename.to_csv(new_full_path, index=False, encoding=goal_encoding)
     print(f"col_type_divide success: {new_full_path}")
 
@@ -79,8 +46,8 @@ def col_type_divide():
 def gen_dataset(d_list):
     data_divide_type_name = data_name.replace(".csv", "_divideType.csv")
     for d in d_list:
-        df = pd.read_csv(dataset_path + data_divide_type_name, na_values=['NULL', 'NaN', 'N/A', 'NA', ''])
-        save_path = dataset_path + data_name.split('.')[0]
+        df = pd.read_csv(base_path + data_divide_type_name, na_values=['NULL', 'NaN', 'N/A', 'NA', ''])
+        save_path = base_path + data_name.split('.')[0]
 
         if d not in ["pay_FS", "pay_DL"]:
             kmeans = KMeans(n_clusters=3, random_state=0)
@@ -109,7 +76,7 @@ def gen_dataset(d_list):
 # 特征选择前的预处理
 def fs_dataset_pre_process(dlist):
     for d in dlist:
-        dataset_fs_path = dataset_path + data_name.replace(".csv", "") + "/"
+        dataset_fs_path = base_path + data_name.replace(".csv", "") + "/"
         data_fs_name = "(Math3-KMeans++ discreted, k=5) " + data_name.replace(".csv", "_divideType_" + d + ".csv")
 
         df = pd.read_csv(dataset_fs_path + data_fs_name)
@@ -141,7 +108,10 @@ def fs_dataset_pre_process(dlist):
 
 if __name__ == '__main__':
     # 需要进行划分的决策属性
-    d_list = [ "k_2_15s_sim_q_1_num"]
+    d_list = ["pay_DL"]
+    # 区分数据集连续和离散字段
     # col_type_divide()
+    # 生成不同决策属性的数据集
     gen_dataset(d_list)
-    # fs_dataset_pre_process(["pay_FS"])
+    # 特征选择前的预处理，在这之前要用离散工具手动离散数据集
+    # fs_dataset_pre_process(d_list)
