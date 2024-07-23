@@ -1,14 +1,9 @@
 import numpy as np
 import pandas as pd
-from pandas.core import series
-from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score, accuracy_score
+from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
@@ -21,7 +16,7 @@ fs_result_fs = pd.read_csv(base_path + "FS-result.csv")
 fs_result_map = {}
 
 for idx, row in fs_result_fs.iterrows():
-    fs_result_map[row["DataSet"]] = row["all_FS"]
+    fs_result_map[row["DataSet"]] = eval(row["all_FS"])
 
 
 def read_data():
@@ -34,6 +29,10 @@ def read_data():
         if 'mode' in locals() and not data[col].empty:  # 检查列是否存在且不为空
             mode = data[col].mode().iloc[0]
             data[col].fillna(mode, inplace=True)
+
+    unique_values = data["discrete_drama_type"].unique()  # 获取列的不重复取值
+    replacement_dict = {value: i for i, value in enumerate(unique_values)}
+    data["discrete_drama_type"] = data["discrete_drama_type"].replace(replacement_dict)
 
     # 识别数值型特征和类别型特征
     numeric_features = []
@@ -52,52 +51,127 @@ def read_data():
     print(f"len numeric_features: {len(numeric_features)} , {numeric_features}")
     print(f"len categorical_features: {len(categorical_features)} , {categorical_features}")
 
-    # 创建预处理器
-
     data.to_csv('curr_ml_predict.csv', encoding='utf-8', index=False)
+    find_null(data)
     # 预处理数据
     X = data.iloc[:, :-1]  # 假设最后一列是目标变量列
     y = data.iloc[:, -1]
-    return X.values, y.values.reshape(-1)
+    return X, y
 
 
-def read_qoe_red():
-    return
+def find_null(df):
+    # 使用 isnull() 和 any() 函数找到存在空值的行和列
+    rows_with_nulls = df.isnull().any(axis=1)
+    cols_with_nulls = df.isnull().any(axis=0)
+
+    print("Rows with null values:")
+    print(df[rows_with_nulls])
+
+    print("\nColumns with null values:")
+    print(cols_with_nulls[cols_with_nulls].index.tolist())
 
 
-def read_pay_red():
-    return fs_result_map[time_window + "_pay_FS_fs"]
+def read_qoe_red_data(data):
+    red = fs_result_map[time_window + "_k_2_15s_sim_q_1_num_fs"]
+    return data.iloc[:,red]
 
 
-def train_predict(X, y, model_type='svm', test_size=0.2, random_state=42):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
-    print(f"X_train shape: {X_train.shape}, X_test shape: {X_test.shape}, y_train shape: {y_train.shape}, y_test: {y_test.shape}")
-    if model_type == 'svm':
-        model = SVC()
-    elif model_type == 'knn':
-        model = KNeighborsClassifier()
-    elif model_type == 'dt':
-        model = DecisionTreeClassifier()
-    elif model_type == "lr":
-        model = LogisticRegression()
-    else:
-        raise ValueError("Invalid model type. Choose from 'svm', 'knn', or 'dt'.")
-
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    return y_pred, model
+def read_pay_red(data):
+    red = fs_result_map[time_window + "_pay_FS_fs"]
+    print(red)
+    return data.iloc[:,red]
 
 
 def evaluate(y_test, y_pred):
     acc = accuracy_score(y_test, y_pred)
     auc = roc_auc_score(y_test, y_pred)
-    return acc, auc
+    precision = precision_score(y_test, y_pred, average='macro')
+    f1 = f1_score(y_test, y_pred, average='macro')
+    return acc, auc, precision, f1
+
+
+def train_predict(X, y, model_list, test_size=0.2, random_state=42):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    print(
+        f"X_train shape: {X_train.shape}, X_test shape: {X_test.shape}, y_train shape: {y_train.shape}, y_test: {y_test.shape}")
+    results = []
+    for model_type in model_list:
+        if model_type == 'svm':
+            model = SVC()
+        elif model_type == 'knn':
+            model = KNeighborsClassifier()
+        elif model_type == 'dt':
+            model = DecisionTreeClassifier()
+        elif model_type == "lr":
+            model = LogisticRegression()
+        else:
+            raise ValueError("Invalid model type. Choose from 'svm', 'knn', or 'dt'.")
+
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        acc, auc, precision, f1 = evaluate(y_test, y_pred)
+        print(f"{model_type} : acc : {acc}, auc :{auc}, f1:{f1}, precision:{precision}")
+        results.append((model_type, acc, auc, precision, f1))
+
+    return results
+
+
+def export_results(results_dict):
+    df = pd.DataFrame(results_dict)
+    df.to_csv("final_results.csv", index=False)
 
 
 if __name__ == '__main__':
     X, y = read_data()
     print(f"process finish , X shape : {X.shape}, Y_shape: {y.shape}")
 
-    model_type = 'dt'  # Change model type to 'knn' or 'dt' if needed
-    y_pred, model = train_predict(X, y, model_type)
-    acc, auc = evaluate(y, y_pred)
+    model_type_list = ['dt', 'lr', 'svm']  # Change model type to 'knn' or 'dt' if needed
+
+    results = []
+
+    # 全特征
+    for model_type, acc, auc, precision, f1 in train_predict(X.values, y.values.reshape(-1), model_type_list,
+                                                             random_state=42):
+        results.append({
+            "特征类型": "全特征",
+            "模型类型": model_type,
+            "accuracy": acc,
+            "auc": auc,
+            "precision": precision,
+            "f1": f1
+        })
+
+    # pay特征
+    X_pay = read_pay_red(X)
+    print(f"process finish , X_pay shape : {X_pay.shape}, Y_shape: {y.shape}")
+
+    find_null(X_pay)
+    for model_type, acc, auc, precision, f1 in train_predict(X_pay.values, y.values.reshape(-1), model_type_list,
+                                                             random_state=42):
+        results.append({
+            "特征类型": "Pay",
+            "模型类型": model_type,
+            "accuracy": acc,
+            "auc": auc,
+            "precision": precision,
+            "f1": f1
+        })
+
+    # QoE特征
+    X_qoe = read_qoe_red_data(X)
+    print(f"process finish , X_qoe shape : {X_qoe.shape}, Y_shape: {y.shape}")
+
+    find_null(X_qoe)
+
+    for model_type, acc, auc, precision, f1 in train_predict(X_qoe.values, y.values.reshape(-1), model_type_list,
+                                                             random_state=42):
+        results.append({
+            "特征类型": "QOE",
+            "模型类型": model_type,
+            "accuracy": acc,
+            "auc": auc,
+            "precision": precision,
+            "f1": f1
+        })
+
+    export_results(results)

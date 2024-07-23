@@ -1,3 +1,5 @@
+import json
+
 import chardet
 
 algorithmNamelist = ['INEC2_threepart_simu']
@@ -30,8 +32,15 @@ def detect_file_encoding(file_path):
 
     # 使用 chardet.detect() 函数检测编码
     result = chardet.detect(raw_data)
+    print(f"The detected  of {base_path + data_name} is: {result}")
+
     return result["encoding"]
 
 
+def get_col_to_idx_map():
+    with open('col_to_idx.json', 'r', encoding='utf-8') as file:
+        col_to_idx = json.load(file)
+    return col_to_idx
+
+
 encoding = detect_file_encoding(base_path + data_name)
-print(f"The detected encoding of {base_path + data_name} is: {encoding}")

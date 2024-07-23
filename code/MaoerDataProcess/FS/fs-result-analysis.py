@@ -14,7 +14,7 @@ dList = ["pay_FS"]
 
 def get_fs_result(time_window, d):
     # data/ProcessingResult/FS-(Math3-KMeans++ discreted, k=5) 0101_0131_all_feature_involved_divideType_pay_FS_ProcessingResult.csv
-    input_path = f"{base_path}ProcessingResult/FS-(Math3-KMeans++ discreted, k=5) {time_window}_all_feature_divideType_{d}_ProcessingResult.csv"
+    input_path = f"{base_path}ProcessingResult/FS-(Math3-KMeans++ discreted k=5) {time_window}_all_feature_divideType_{d}_ProcessingResult.csv"
     f = open(input_path, "r")
     output_path = f"{base_path}/FS-result.csv"
     lines = f.readlines()  # 读取全部内容 ，并以列表方式返回
@@ -131,8 +131,8 @@ def fs_result_to_txt():
 
 
 if __name__ == '__main__':
-    # get_fs_result("0101_0131", "k_2_15s_sim_q_1_num")
-    # get_fs_result("0101_0131", "pay_FS")
+    get_fs_result("0101_0131", "k_2_15s_sim_q_1_num")
+    get_fs_result("0101_0131", "pay_FS")
 
     # fs_analysis()
     fs_result_to_txt()

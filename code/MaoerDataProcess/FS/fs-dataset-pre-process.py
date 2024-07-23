@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 
-from common import base_path, goal_encoding, no_need_col, D, is_continuous, data_name
+from common import base_path, goal_encoding, no_need_col, D, is_continuous, data_name, encoding, get_col_to_idx_map
 
 
 # 划分数据类型，连续与离散,并写入文件
@@ -17,8 +17,12 @@ def col_type_divide():
         "discrete": [],
         "continues": []
     }
+    col_idx_map = get_col_to_idx_map()
     new_col_name_map = {}
     for col in df.columns:
+        if col not in col_idx_map.keys() and col not in d_list:
+            df.drop(col, axis=1, inplace=True)
+            continue
         if col in no_need_col:
             df.drop(col, axis=1, inplace=True)
             continue
@@ -77,7 +81,7 @@ def gen_dataset(d_list):
 def fs_dataset_pre_process(dlist):
     for d in dlist:
         dataset_fs_path = base_path + data_name.replace(".csv", "") + "/"
-        data_fs_name = "(Math3-KMeans++ discreted, k=5) " + data_name.replace(".csv", "_divideType_" + d + ".csv")
+        data_fs_name = "(Math3-KMeans++ discreted k=5) " + data_name.replace(".csv", "_divideType_" + d + ".csv")
 
         df = pd.read_csv(dataset_fs_path + data_fs_name)
         # 添加索引列，并将第一列名设置为 'name'
@@ -108,10 +112,10 @@ def fs_dataset_pre_process(dlist):
 
 if __name__ == '__main__':
     # 需要进行划分的决策属性
-    d_list = ["pay_DL"]
+    d_list = ["pay_FS","k_2_15s_sim_q_1_num"]
     # 区分数据集连续和离散字段
     # col_type_divide()
     # 生成不同决策属性的数据集
-    gen_dataset(d_list)
+    # gen_dataset(d_list)
     # 特征选择前的预处理，在这之前要用离散工具手动离散数据集
-    # fs_dataset_pre_process(d_list)
+    fs_dataset_pre_process(d_list)
