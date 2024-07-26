@@ -100,6 +100,7 @@ def fs_analysis():
 
 
 def fs_result_to_txt():
+    output_path = "DL_windows_fs.csv"
     with open('idx_to_col.json', 'r', encoding='utf-8') as file:
         idx_to_col_map = json.load(file)
     print(idx_to_col_map)
@@ -118,21 +119,62 @@ def fs_result_to_txt():
     common_features = set.intersection(*feature_sets.values())
     unique_features = {data_set: feature_set - common_features for data_set, feature_set in feature_sets.items()}
 
+    QoE = []
+    CHONGHE = []
+    FUFEI = []
+    QOE_continue = []
+    QOE_discrete = []
+    CHONGHE_continue = []
+    CHONGHE_discrete = []
+    FUFEI_continue = []
+    FUFEI_discrete = []
     # 打印结果
     print("\n交叉项目：")
     for feature in common_features:
         print(feature)
+        CHONGHE.append(feature)
+        if "discrete" in feature:
+            CHONGHE_discrete.append(feature)
+        else:
+            CHONGHE_continue.append(feature)
 
-    print("\n独有项目：")
-    for data_set, unique_features in unique_features.items():
-        print(f"{data_set}:")
-        for feature in unique_features:
-            print(f"  {feature}")
+    print("\nQoE独有项目：")
+    for feature in unique_features.get("0101_0131_k_2_15s_sim_q_1_num_fs"):
+
+        QoE.append(feature)
+        if "discrete" in feature:
+            QOE_discrete.append(feature)
+        else:
+            QOE_continue.append(feature)
+
+    print("\npay独有项目：")
+    for feature in unique_features.get("0101_0131_pay_FS_fs"):
+
+        if "discrete" in feature:
+            FUFEI_discrete.append(feature)
+        else:
+            FUFEI_continue.append(feature)
+
+    if not os.path.exists(output_path):
+        with open(output_path, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(
+                ['DataSet','QoE,CHONGHE', 'FUFEI,QOE_continue', 'QOE_discrete', 'CHONGHE_continue', 'CHONGHE_discrete',
+                 'FUFEI_continue', 'FUFEI_discrete'])
+    with open(output_path, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(
+            ['0101_0131',QoE, CHONGHE, FUFEI, QOE_continue, QOE_discrete, CHONGHE_continue, CHONGHE_discrete, FUFEI_continue,
+             FUFEI_discrete])
+
+
+def fs_to_dl():
+    return
 
 
 if __name__ == '__main__':
-    get_fs_result("0101_0131", "k_2_15s_sim_q_1_num")
-    get_fs_result("0101_0131", "pay_FS")
+    # get_fs_result("0101_0131", "k_2_15s_sim_q_1_num")
+    # get_fs_result("0101_0131", "pay_FS")
 
     # fs_analysis()
     fs_result_to_txt()

@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -71,15 +73,58 @@ def find_null(df):
     print(cols_with_nulls[cols_with_nulls].index.tolist())
 
 
-def read_qoe_red_data(data):
+def get_qoe_red_data(data):
     red = fs_result_map[time_window + "_k_2_15s_sim_q_1_num_fs"]
-    return data.iloc[:,red]
+    return data.iloc[:, red]
 
 
-def read_pay_red(data):
+def get_pay_red_data(data):
     red = fs_result_map[time_window + "_pay_FS_fs"]
     print(red)
-    return data.iloc[:,red]
+    return data.iloc[:, red]
+
+
+def get_pay_only_red_data(data):
+    difference_list = [item for item in fs_result_map[time_window + "_pay_FS_fs"] if
+                       item not in fs_result_map[time_window + "_k_2_15s_sim_q_1_num_fs"]]
+    return data.iloc[:, difference_list]
+
+
+def get_qoe_only_red_data(data):
+    difference_list = [item for item in fs_result_map[time_window + "_k_2_15s_sim_q_1_num_fs"] if
+                       item not in fs_result_map[time_window + "_pay_FS_fs"]]
+    return data.iloc[:, difference_list]
+
+
+def get_pay_qoe_intersection_red_data(data):
+    intersection_list = list(
+        set(fs_result_map[time_window + "_k_2_15s_sim_q_1_num_fs"]) & set(fs_result_map[time_window + "_pay_FS_fs"]))
+
+    return data.iloc[:, intersection_list]
+
+
+def get_pay_qoe_union_red_data(data):
+    union_list = list(
+        set(fs_result_map[time_window + "_k_2_15s_sim_q_1_num_fs"]) | set(fs_result_map[time_window + "_pay_FS_fs"]))
+    return data.iloc[:, union_list]
+
+
+# QoE + Pay - Cross
+def get_not_cross_data(data):
+    union_list = set(fs_result_map[time_window + "_k_2_15s_sim_q_1_num_fs"]) | set(
+        fs_result_map[time_window + "_pay_FS_fs"])
+    intersection_list = set(fs_result_map[time_window + "_k_2_15s_sim_q_1_num_fs"]) & set(
+        fs_result_map[time_window + "_pay_FS_fs"])
+    return data.iloc[:, list(union_list - intersection_list)]
+
+
+def get_random_data(data, k):
+    # 生成一个包含0到608范围内所有整数的列表
+    numbers = list(range(0, 609))
+    # 从列表中随机选取20个不同的数
+    random_numbers = random.sample(numbers, k)
+    print(f"red: {random_numbers}")
+    return data.iloc[:, random_numbers]
 
 
 def evaluate(y_test, y_pred):
@@ -118,7 +163,7 @@ def train_predict(X, y, model_list, test_size=0.2, random_state=42):
 
 def export_results(results_dict):
     df = pd.DataFrame(results_dict)
-    df.to_csv("final_results.csv", index=False)
+    df.to_csv("final_results.csv", index=False, mode='a')
 
 
 if __name__ == '__main__':
@@ -129,49 +174,145 @@ if __name__ == '__main__':
 
     results = []
 
-    # 全特征
-    for model_type, acc, auc, precision, f1 in train_predict(X.values, y.values.reshape(-1), model_type_list,
-                                                             random_state=42):
-        results.append({
-            "特征类型": "全特征",
-            "模型类型": model_type,
-            "accuracy": acc,
-            "auc": auc,
-            "precision": precision,
-            "f1": f1
-        })
+    # # 全特征
+    # for model_type, acc, auc, precision, f1 in train_predict(X.values, y.values.reshape(-1), model_type_list,
+    #                                                          random_state=42):
+    #     results.append({
+    #         "特征类型": "全特征",
+    #         "模型类型": model_type,
+    #         "accuracy": acc,
+    #         "auc": auc,
+    #         "precision": precision,
+    #         "f1": f1
+    #     })
+    #
+    # # pay特征
+    # X_pay = get_pay_red_data(X)
+    # print(f"process finish , X_pay shape : {X_pay.shape}, Y_shape: {y.shape}")
+    #
+    # for model_type, acc, auc, precision, f1 in train_predict(X_pay.values, y.values.reshape(-1), model_type_list,
+    #                                                          random_state=42):
+    #     results.append({
+    #         "特征类型": "Pay",
+    #         "模型类型": model_type,
+    #         "accuracy": acc,
+    #         "auc": auc,
+    #         "precision": precision,
+    #         "f1": f1
+    #     })
+    #
+    # # QoE特征
+    # X_qoe = get_qoe_red_data(X)
+    # print(f"process finish , X_qoe shape : {X_qoe.shape}, Y_shape: {y.shape}")
+    #
+    # for model_type, acc, auc, precision, f1 in train_predict(X_qoe.values, y.values.reshape(-1), model_type_list,
+    #                                                          random_state=42):
+    #     results.append({
+    #         "特征类型": "QOE",
+    #         "模型类型": model_type,
+    #         "accuracy": acc,
+    #         "auc": auc,
+    #         "precision": precision,
+    #         "f1": f1
+    #     })
+    #
 
-    # pay特征
-    X_pay = read_pay_red(X)
-    print(f"process finish , X_pay shape : {X_pay.shape}, Y_shape: {y.shape}")
+    # # QoE only
+    # X_qoe_only = get_qoe_only_red_data(X)
+    # for model_type, acc, auc, precision, f1 in train_predict(X_qoe_only.values, y.values.reshape(-1),
+    #                                                          model_type_list,
+    #                                                          random_state=42):
+    #     results.append({
+    #         "特征类型": "QoE only",
+    #         "模型类型": model_type,
+    #         "accuracy": acc,
+    #         "auc": auc,
+    #         "precision": precision,
+    #         "f1": f1
+    #     })
+    #
+    # # pay only
+    # X_pay_only = get_pay_only_red_data(X)
+    # for model_type, acc, auc, precision, f1 in train_predict(X_pay_only.values, y.values.reshape(-1),
+    #                                                          model_type_list,
+    #                                                          random_state=42):
+    #     results.append({
+    #         "特征类型": "pay only",
+    #         "模型类型": model_type,
+    #         "accuracy": acc,
+    #         "auc": auc,
+    #         "precision": precision,
+    #         "f1": f1
+    #     })
+    #
+    # # cross
+    # X_cross = get_pay_qoe_intersection_red_data(X)
+    # for model_type, acc, auc, precision, f1 in train_predict(X_cross.values, y.values.reshape(-1), model_type_list,
+    #                                                          random_state=42):
+    #     results.append({
+    #         "特征类型": "cross",
+    #         "模型类型": model_type,
+    #         "accuracy": acc,
+    #         "auc": auc,
+    #         "precision": precision,
+    #         "f1": f1
+    #     })
+    # export_results(results)
 
-    find_null(X_pay)
-    for model_type, acc, auc, precision, f1 in train_predict(X_pay.values, y.values.reshape(-1), model_type_list,
-                                                             random_state=42):
-        results.append({
-            "特征类型": "Pay",
-            "模型类型": model_type,
-            "accuracy": acc,
-            "auc": auc,
-            "precision": precision,
-            "f1": f1
-        })
+    # X_union = get_pay_qoe_union_red_data(X)
+    # for model_type, acc, auc, precision, f1 in train_predict(X_union.values, y.values.reshape(-1), model_type_list,
+    #                                                          random_state=42):
+    #     results.append({
+    #         "特征类型": "union",
+    #         "模型类型": model_type,
+    #         "accuracy": acc,
+    #         "auc": auc,
+    #         "precision": precision,
+    #         "f1": f1
+    #     })
+    # export_results(results)
 
-    # QoE特征
-    X_qoe = read_qoe_red_data(X)
-    print(f"process finish , X_qoe shape : {X_qoe.shape}, Y_shape: {y.shape}")
+    # X_not_cross = get_not_cross_data(X)
+    # for model_type, acc, auc, precision, f1 in train_predict(X_not_cross.values, y.values.reshape(-1), model_type_list,
+    #                                                          random_state=42):
+    #     results.append({
+    #         "特征类型": "not cross",
+    #         "模型类型": model_type,
+    #         "accuracy": acc,
+    #         "auc": auc,
+    #         "precision": precision,
+    #         "f1": f1
+    #     })
+    # export_results(results)
 
-    find_null(X_qoe)
+    # 初始化一个空列表来存储所有迭代的结果
+    all_results = []
 
-    for model_type, acc, auc, precision, f1 in train_predict(X_qoe.values, y.values.reshape(-1), model_type_list,
-                                                             random_state=42):
-        results.append({
-            "特征类型": "QOE",
-            "模型类型": model_type,
-            "accuracy": acc,
-            "auc": auc,
-            "precision": precision,
-            "f1": f1
-        })
+    # 运行10次
+    for _ in range(10):
+        # 从数据集中随机选择20个特征
+        X_random_20 = get_random_data(X, 20)
 
-    export_results(results)
+        # 训练模型并获取结果
+        for model_type, acc, auc, precision, f1 in train_predict(X_random_20.values, y.values.reshape(-1),
+                                                                 model_type_list,
+                                                                 random_state=42):
+            # 将结果追加到列表中
+            all_results.append({
+                "特征类型": "random_20",
+                "模型类型": model_type,
+                "accuracy": acc,
+                "auc": auc,
+                "precision": precision,
+                "f1": f1
+            })
+
+    # 计算各项指标的平均值
+    average_results = {
+        "特征类型": "random_20",
+        "模型类型": "average",
+        "accuracy": np.mean([result["accuracy"] for result in all_results]),
+        "auc": np.mean([result["auc"] for result in all_results]),
+        "precision": np.mean([result["precision"] for result in all_results]),
+        "f1": np.mean([result["f1"] for result in all_results])
+    }
