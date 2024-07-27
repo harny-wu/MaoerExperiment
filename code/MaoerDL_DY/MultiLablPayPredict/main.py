@@ -371,7 +371,7 @@ class TensorDatasettoDict(Dataset):
 
 
 if __name__ == '__main__':
-    data_path_prefix = "../../Dataset/"
+    data_path_prefix = "../Dataset/"
     # 模型运行
     for data_time_windows in data_time_windows_list:
 
@@ -390,9 +390,9 @@ if __name__ == '__main__':
         total_continue_feature = user_feature_continue_column + user_history_pay_QOE_continue_column + user_history_pay_CHONGHE_continue_column + user_history_pay_FUFEI_continue_column
         total_discrete_feature = user_feature_discrete_column + user_history_pay_QOE_discrete_column + user_history_pay_CHONGHE_discrete_column + user_history_pay_FUFEI_discrete_column
         total_discrete_feature_add_D = user_feature_discrete_column + user_history_pay_QOE_discrete_column + user_history_pay_CHONGHE_discrete_column + user_history_pay_FUFEI_discrete_column
-        total_discrete_feature_add_D.append('user_in_drama_is_pay_for_drama_in_next_time')
+        total_discrete_feature_add_D.append('pay_DL')
         user_history_pay_CHONGHE_discrete_column_add_D = copy.deepcopy(user_history_pay_CHONGHE_discrete_column)
-        user_history_pay_CHONGHE_discrete_column_add_D.append('user_in_drama_is_pay_for_drama_in_next_time')
+        user_history_pay_CHONGHE_discrete_column_add_D.append('pay_DL')
         tensor_dict_idx = ['pay_QOE_continue', 'pay_QOE_discrete', 'pay_CHONGHE_continue', 'pay_CHONGHE_discrete',
                            'pay_FUFEI_continue', 'pay_FUFEI_discrete', 'target_QOE_continue', 'target_QOE_discrete',
                            'target_CHONGHE_continue', 'target_CHONGHE_discrete', 'target_FUFEI_continue',
