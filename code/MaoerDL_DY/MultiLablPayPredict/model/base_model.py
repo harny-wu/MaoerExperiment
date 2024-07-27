@@ -10,9 +10,9 @@ from _collections import OrderedDict  # 导入 OrderedDict 来保持字典中键
 
 from torch import device
 
-from Maoer.MultiLablPayPredict.config import batch_size
-from Maoer.MultiLablPayPredict.layer.common import dense_layer_noReLu
-from Maoer.MultiLablPayPredict.layer.embedding import UserPayHistoryEmbedding, TargetEmbedding, HistoryDimScalingLayer, \
+from MultiLablPayPredict.config import batch_size
+from MultiLablPayPredict.layer.common import dense_layer_noReLu
+from MultiLablPayPredict.layer.embedding import UserPayHistoryEmbedding, TargetEmbedding, HistoryDimScalingLayer, \
     TargetDimScalingLayer, History_Target_AttentionLayer
 
 

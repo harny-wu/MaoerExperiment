@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from Maoer.MultiLablPayPredict.config import max_history_len
+from MultiLablPayPredict.config import max_history_len
 
 
 # 多头自注意力
