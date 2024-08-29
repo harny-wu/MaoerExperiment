@@ -8,13 +8,10 @@ import pandas as pd
 
 from common import base_path, ExecCategory
 
-time_windows = ["0101_0131"]
-dList = ["pay_FS"]
-
 
 def get_fs_result(time_window, d):
     # data/ProcessingResult/FS-(Math3-KMeans++ discreted, k=5) 0101_0131_all_feature_involved_divideType_pay_FS_ProcessingResult.csv
-    input_path = f"{base_path}ProcessingResult/FS-(Math3-KMeans++ discreted k=5) {time_window}_all_feature_divideType_{d}_ProcessingResult.csv"
+    input_path = f"{base_path}ProcessingResult/FS-(Math3-KMeans++ discreted k=5) {time_window}_all_feature_FS_divideType_{d}_ProcessingResult.csv"
     f = open(input_path, "r")
     output_path = f"{base_path}/FS-result.csv"
     lines = f.readlines()  # 读取全部内容 ，并以列表方式返回
@@ -62,7 +59,7 @@ def fs_analysis():
     QOE_unique_feature = []
     FUFEI_unique_feature = []
     df = pd.read_csv(
-        "/data/FS-result.csv",
+        "../../../data/FS-result.csv",
         header=0)
     # 查找 '数据集名称' 在第一列出现的最后一次的索引
     last_index = df.iloc[::-1][df.columns[0]].tolist().index("0101_0131_pay_FS_fs")
@@ -140,7 +137,7 @@ def fs_result_to_txt():
 
     print("\nQoE独有项目：")
     for feature in unique_features.get("0101_0131_k_2_15s_sim_q_1_num_fs"):
-
+        print(feature)
         QoE.append(feature)
         if "discrete" in feature:
             QOE_discrete.append(feature)
@@ -149,7 +146,8 @@ def fs_result_to_txt():
 
     print("\npay独有项目：")
     for feature in unique_features.get("0101_0131_pay_FS_fs"):
-
+        print(feature)
+        FUFEI.append(feature)
         if "discrete" in feature:
             FUFEI_discrete.append(feature)
         else:
@@ -159,12 +157,14 @@ def fs_result_to_txt():
         with open(output_path, 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(
-                ['DataSet','QoE,CHONGHE', 'FUFEI,QOE_continue', 'QOE_discrete', 'CHONGHE_continue', 'CHONGHE_discrete',
+                ['DataSet', 'QoE', 'CHONGHE', 'FUFEI', 'QOE_continue', 'QOE_discrete', 'CHONGHE_continue',
+                 'CHONGHE_discrete',
                  'FUFEI_continue', 'FUFEI_discrete'])
     with open(output_path, 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(
-            ['0101_0131',QoE, CHONGHE, FUFEI, QOE_continue, QOE_discrete, CHONGHE_continue, CHONGHE_discrete, FUFEI_continue,
+            ['0101_0131', QoE, CHONGHE, FUFEI, QOE_continue, QOE_discrete, CHONGHE_continue, CHONGHE_discrete,
+             FUFEI_continue,
              FUFEI_discrete])
 
 
@@ -175,6 +175,6 @@ def fs_to_dl():
 if __name__ == '__main__':
     # get_fs_result("0101_0131", "k_2_15s_sim_q_1_num")
     # get_fs_result("0101_0131", "pay_FS")
-
+    #
     # fs_analysis()
     fs_result_to_txt()

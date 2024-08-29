@@ -41,7 +41,7 @@ public class Main {
 //		                "1115_1215_all_feature", "1115_1215_all_feature_involved",
 //		                "1201_1231_all_feature", "1201_1231_all_feature_involved",
 //		                "1215_0115_all_feature", "1215_0115_all_feature_involved"}; // "GLI_85","BASEHOCK","car","Isolet","leukemia","madelon","nci9","nursery","orlraws10P","PCMAC","qsar_androgen_receptor","gisette",		
-		String[] datasetNames ={"(Seq) 0101_0131_all_feature_involved_all_deal(D=kmean3)"};
+		String[] datasetNames ={"FS-(Math3-KMeans++ discreted k=5) 0101_0131_all_feature_FS_divideType_k_2_15s_sim_q_1_num"};
 		//String[] datasetNames = {"k_1_8s_sim","k_3_8s_sim","k_1_15s_sim","k_3_15s_sim","k_2_8s_sim_q_1_num","k_2_8s_sim_q_2_num","k_2_8s_sim_q_3_num","k_2_15s_sim_q_1_num","k_2_15s_sim_q_2_num","k_2_15s_sim_q_3_num","all_8_sim","all_15_sim","k_2_8s_sim","k_2_15s_sim"};//"all_8_sim","all_15_sim","k_2_8s_sim","k_2_15s_sim"
 		//"breast-cancer-wisconsin","horse-colic","advertisements_MDLP","mushroom","audiology","hepatitis"
 		//"hepatitis_missingFill","audiology_missingFill","horse-colic_MDLP_missingFill","breast-cancer-wisconsin_missingFill","advertisements_missingFill","mushroom_missingFill"
@@ -50,7 +50,7 @@ public class Main {
 		//仅FSSNC："hepatitis_missingFill","audiology_missingFill","horse-colic_MDLP_missingFill","breast-cancer-wisconsin_missingFill","leukemia","tic-tac-toe","chess","orlraws10P_MDLP","Prostate_GE","AR10P","lung","PIE10P","pd_speech_features"
 		String missingratio = "10%";
 		// String Path = "C:\\Users\\Administrator\\Desktop\\dataset\\测试数据_INEC\\" + missingratio + "_MissingValue";
-		String Path = "/Users/daidaiwu/学校/大论文/MaoerExperiment/data/FS/0101-1031/k_2_15s_sim_q_1_num/kmean/";
+		String Path = "/Users/daidaiwu/学校/大论文/MaoerExperiment/data/0101_0131_all_feature_FS/";
 		//String Path = "/Users/ly/Desktop/工作/大论文/数据/量化方法实验/";
 		for (int i = 0; i < datasetNames.length; i++) {
 			String filePath = Path + "/" + datasetNames[i] +  ".csv";

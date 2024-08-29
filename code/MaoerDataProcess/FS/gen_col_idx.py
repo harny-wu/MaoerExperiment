@@ -2,10 +2,10 @@ import json
 
 import pandas as pd
 
-from common import base_path, no_need_col, D, detect_file_encoding
+from common import base_path, no_need_col, D, detect_file_encoding, data_name
 
 if __name__ == '__main__':
-    data = base_path + "0101_0131_all_feature_divideType.csv"
+    data = base_path + "0101_0131_all_feature_FS_divideType.csv"
     df = pd.read_csv(data, encoding=detect_file_encoding(data))
     idx_to_col = {}
     col_to_idx = {}

@@ -6,10 +6,10 @@ algorithmNamelist = ['INEC2_threepart_simu']
 ExecCategory = 'IncrementalReduce'  # 'StaticReduce'
 base_path = "../../../data/"
 goal_encoding = "utf-8"
-data_name = "0101_0131_all_feature.csv"
+data_name = "0101_0131_all_feature_FS.csv"
 
 no_need_col = [
-    "sound_id", "user_id", "drama_id", "user_in_drama_is_pay_for_drama_in_next_time"
+    "sound_id", "user_id", "drama_id", "user_in_drama_is_pay_for_drama_in_next_time","first_pay","pay_Random"
 ]
 
 # 决策属性

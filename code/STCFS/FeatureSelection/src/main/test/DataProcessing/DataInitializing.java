@@ -91,7 +91,7 @@ public class DataInitializing {
 			String filename = file;
 			//for (int i = 0; i < num.length; i++) {
 				//String filePathnew = "/Users/ly/Desktop/工作/大论文/数据/量化方法实验/" + filename + "/" + filename + ".csv";
-				String filePathnew = "/Users/daidaiwu/学校/大论文/MaoerExperiment/data/FS/0101-1031/k_2_15s_sim_q_1_num/kmean/(Seq) 0101_0131_all_feature_involved_all_deal(D=kmean3).csv";
+				String filePathnew = "/Users/daidaiwu/学校/大论文/MaoerExperiment/data/0101_0131_all_feature_FS/FS-(Math3-KMeans++ discreted k=5) 0101_0131_all_feature_FS_divideType_k_2_15s_sim_q_1_num.csv";
 //				String filePathnew = "C:\\Users\\Administrator\\Desktop\\dataset\\测试数据_INEC\\" + num[i]
 //						+ "%_MissingValue\\" + filename + "\\" + filename + ".csv";
 				DataProcessing data = new DataProcessing(filePathnew);
