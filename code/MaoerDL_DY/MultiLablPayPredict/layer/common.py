@@ -2,7 +2,7 @@ import math
 
 from torch import nn
 
-
+# 3.基础模型 embedding、attention
 # 构建离散特征的embedding
 def discrete_embedding(feature_category_num_dict, feature_column_name_list, embedding_dim):  # 输入特征取值大小的集合,特征数,维度
     # 创建一个列表来存储每个嵌入层
@@ -50,8 +50,36 @@ def category_feature_num(feature_category_num_dict, feature_column_name_list):
     return category_feature_num_list
 
 
+# SE层中找到合适的reduction使channel // reduction得到整数
+def find_reduction(channel, min_reduction=2, max_reduction=19):
+    # 对于质数，直接取自己作为reduction  
+    if is_prime(channel):
+        return channel
 
-# 输入(batch,feature_num,embedding_dim,1) ->(batch,feature_num,embedding_dim,1)->输出特征权重及权重乘后的(batch,embedding_dim)
+        # 计算介于min_reduction和max_reduction之间的候选reduction值  
+    candidates = [i for i in range(min_reduction, max_reduction + 1) if channel % i == 0]
+
+    # 如果候选列表为空，则至少取2作为reduction  
+    if not candidates:
+        return min_reduction
+
+        # 尝试找到最大的候选值，使得channel // reduction的结果尽可能大  
+    reduction = max(candidates)
+
+    return reduction
+
+
+def is_prime(n):
+    """判断一个数是否为质数"""
+    if n < 2:
+        return False
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+
+# 输入(batch,feature_num,embedding_dim,1) ->(batch,feature_num,embedding_dim,1)->输出特征权重及权重乘后的(batch,embedding_dim) 
 class SELayer(nn.Module):
     def __init__(self, channel, reduction=16):
         super(SELayer, self).__init__()
@@ -71,7 +99,7 @@ class SELayer(nn.Module):
         y = self.avg_pool(x).view(b, c)
         # print('y',y)
         weight = self.fc(y).view(b, c, 1, 1)
-        new_x = x * weight.expand_as(x)  # 利用了 PyTorch 的广播机制，使得张量 weight 被复制成与输入 x 相同的形状，然后进行逐元素相乘
+        new_x = x * weight.expand_as(x)  # 利用了 PyTorch 的广播机制，使得张量 weight 被复制成与输入 x 相同的形状，然后进行逐元素相乘 
         # 加权平均 (batch, embedding_dim)
         weighted_avg_out_x = new_x.mean(dim=1, keepdim=True)  # 在 feature_num维度上取平均，保持维度
         # 调整维度
@@ -82,32 +110,3 @@ class SELayer(nn.Module):
 
         return weight, weighted_avg_out_x, new_x
 
-
-# SE层中找到合适的reduction使channel // reduction得到整数
-def find_reduction(channel, min_reduction=2, max_reduction=19):
-    # 对于质数，直接取自己作为reduction
-    if is_prime(channel):
-        return channel
-
-        # 计算介于min_reduction和max_reduction之间的候选reduction值
-    candidates = [i for i in range(min_reduction, max_reduction + 1) if channel % i == 0]
-
-    # 如果候选列表为空，则至少取2作为reduction
-    if not candidates:
-        return min_reduction
-
-        # 尝试找到最大的候选值，使得channel // reduction的结果尽可能大
-    reduction = max(candidates)
-
-    return reduction
-
-
-
-def is_prime(n):
-    """判断一个数是否为质数"""
-    if n < 2:
-        return False
-    for i in range(2, int(math.sqrt(n)) + 1):
-        if n % i == 0:
-            return False
-    return True

@@ -11,5 +11,5 @@ num_tasks = 2
 continue_embedding_dim = 200
 discrete_embedding_dim = 200
 lr = 0.1
-batch_size = 128
+batch_size = 4
 threshold = 0.5

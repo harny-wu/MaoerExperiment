@@ -1,9 +1,9 @@
 import torch
 from torch import nn
 
-from MultiLablPayPredict.config import max_history_len, feature_dim
-from MultiLablPayPredict.layer.basic_attention import MultiHeadSelfAttention, MultiHeadHistory_TargetAttention
-from MultiLablPayPredict.layer.common import discrete_embedding, continuous_embedding, category_feature_num, SELayer
+from config import max_history_len, feature_dim
+from layer.basic_attention import MultiHeadSelfAttention, MultiHeadHistory_TargetAttention
+from layer.common import discrete_embedding, continuous_embedding, category_feature_num, SELayer
 
 # user_history_feature 对于一个user的多个历史行为，将其拼接成一维向量 要先经过一层通道注意力机制得到最后结果
 # (样本数,history,20,200) ->多头 ->(样本数,20,200)->转置->(样本数,200,20) ->SE->特征权重->(样本数,200,20) ->转置-> 加权->(样本数,1，200)
@@ -47,7 +47,7 @@ class UserPayHistoryEmbedding(nn.Module):
         # user_history_discrete_features_embedding 得到(batch, 1, discrete_feature_num, discrete_embedding_dim)
         # history中有三种：QOE/CHONGHE/FUFEI,将其分别转化为embedding然后合并
         # embedding的数据要求输入是整数类型 因此转为int，输入数据得是从0开始的索引后的数据，因此mask后得到-1以及在输入时得到了从0开始的索引后值，
-        # 现在所有discrete数据输入时+1，即 batch_feature_tensor_pay_QOE_discrete[:, :, i]+1
+        # 现在所有discrete数据输入时+1，即 batch_feature_tensor_pay_QOE_discrete[:, :, i]+1 
         # for i in range(batch_feature_tensor_pay_QOE_discrete.shape[2]):
         #     print(i,batch_feature_tensor_pay_QOE_discrete.shape[2],batch_feature_tensor_pay_QOE_discrete[:, :, i]+1,self.user_pay_history_QOE_discrete_embeddings[i].num_embeddings )
         batch_feature_tensor_pay_QOE_discrete = batch_feature_tensor_pay_QOE_discrete.int()

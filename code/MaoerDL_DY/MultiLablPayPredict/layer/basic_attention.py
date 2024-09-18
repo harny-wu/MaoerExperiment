@@ -1,15 +1,14 @@
 import torch
 from torch import nn
 
-from MultiLablPayPredict.config import max_history_len
-
+from config import max_history_len
 
 # 多头自注意力
 class MultiHeadSelfAttention(nn.Module):
     def __init__(self, num_heads, feature_dim, max_history_len):
         super(MultiHeadSelfAttention, self).__init__()
-        self.num_heads = num_heads  # 10
-        self.feature_dim = feature_dim  # 200
+        self.num_heads = num_heads  #10
+        self.feature_dim = feature_dim  #200
         self.head_dim = feature_dim // num_heads
         self.max_history_len = max_history_len
 
@@ -25,7 +24,7 @@ class MultiHeadSelfAttention(nn.Module):
         V = self.WV(history_matrix)
 
         Q = Q.view(batch_size, history_len, self.num_heads, self.head_dim).permute(0, 2, 1,
-                                                                                   3)  # (batch,num_heads,history_len,head_dim)
+                                                                                   3)  #(batch,num_heads,history_len,head_dim)
         K = K.view(batch_size, history_len, self.num_heads, self.head_dim).permute(0, 2, 1, 3)
         V = V.view(batch_size, history_len, self.num_heads, self.head_dim).permute(0, 2, 1, 3)
 
@@ -34,12 +33,12 @@ class MultiHeadSelfAttention(nn.Module):
         if mask is not None:
             mask = mask.permute(0, 2, 1)  # 二、三维度互换  变为(batch, feature_num, history)
             temp_dim = mask.shape[1]
-            # （样本数*特征数,历史数）
+            #（样本数*特征数,历史数）
             mask = mask.reshape(-1, max_history_len)
-            attention_scores = attention_scores.masked_fill(mask.unsqueeze(1).unsqueeze(2).bool(), float('-inf'))  # ()
+            attention_scores = attention_scores.masked_fill(mask.unsqueeze(1).unsqueeze(2).bool(), float('-1e30'))  #()
 
-        attention_weights = torch.softmax(attention_scores, dim=-1)  # shape(batch,head,history_len,history_len)
-        # (batch,history_len,200)
+        attention_weights = torch.softmax(attention_scores, dim=-1)  #shape(batch,head,history_len,history_len)
+        #(batch,history_len,200)
         weighted_sum = torch.matmul(attention_weights, V).permute(0, 2, 1, 3).contiguous().view(batch_size, history_len,
                                                                                                 self.feature_dim)
         # 计算加权平均
@@ -49,7 +48,6 @@ class MultiHeadSelfAttention(nn.Module):
         # print('weighted_sum',weighted_avg_out.shape)
 
         return attention_weights, weighted_avg_out, weighted_sum
-
 
 # 注意力机制 关于用
 class MultiHeadHistory_TargetAttention(nn.Module):
