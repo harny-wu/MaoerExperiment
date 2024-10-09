@@ -1,9 +1,10 @@
 import torch
 from torch import nn
 
-from config import max_history_len, feature_dim
-from layer.basic_attention import MultiHeadSelfAttention, MultiHeadHistory_TargetAttention
-from layer.common import discrete_embedding, continuous_embedding, category_feature_num, SELayer
+from MultiLablPayPredict.config import max_history_len, feature_dim
+from MultiLablPayPredict.layer.basic_attention import MultiHeadSelfAttention, MultiHeadHistory_TargetAttention
+from MultiLablPayPredict.layer.common import discrete_embedding, continuous_embedding, category_feature_num, SELayer
+
 
 # user_history_feature 对于一个user的多个历史行为，将其拼接成一维向量 要先经过一层通道注意力机制得到最后结果
 # (样本数,history,20,200) ->多头 ->(样本数,20,200)->转置->(样本数,200,20) ->SE->特征权重->(样本数,200,20) ->转置-> 加权->(样本数,1，200)
@@ -47,7 +48,7 @@ class UserPayHistoryEmbedding(nn.Module):
         # user_history_discrete_features_embedding 得到(batch, 1, discrete_feature_num, discrete_embedding_dim)
         # history中有三种：QOE/CHONGHE/FUFEI,将其分别转化为embedding然后合并
         # embedding的数据要求输入是整数类型 因此转为int，输入数据得是从0开始的索引后的数据，因此mask后得到-1以及在输入时得到了从0开始的索引后值，
-        # 现在所有discrete数据输入时+1，即 batch_feature_tensor_pay_QOE_discrete[:, :, i]+1 
+        # 现在所有discrete数据输入时+1，即 batch_feature_tensor_pay_QOE_discrete[:, :, i]+1
         # for i in range(batch_feature_tensor_pay_QOE_discrete.shape[2]):
         #     print(i,batch_feature_tensor_pay_QOE_discrete.shape[2],batch_feature_tensor_pay_QOE_discrete[:, :, i]+1,self.user_pay_history_QOE_discrete_embeddings[i].num_embeddings )
         batch_feature_tensor_pay_QOE_discrete = batch_feature_tensor_pay_QOE_discrete.int()
@@ -167,14 +168,15 @@ class TargetEmbedding(nn.Module):
 
 # 用户历史embedding 多头+SE  (batch, history, feature_num, feature_dim)->(batch, 1，feature_dim)
 class HistoryDimScalingLayer(nn.Module):
-    def __init__(self, num_heads, feature_dim, feature_category_num_dict, max_history_len,feature_column_dict):
+    def __init__(self, num_heads, feature_dim, feature_category_num_dict, max_history_len, feature_column_dict):
         super(HistoryDimScalingLayer, self).__init__()
         self.feature_column_dict = feature_column_dict
         # 多头注意力
         self.multi_head_attention = MultiHeadSelfAttention(num_heads, feature_dim, max_history_len)
         # SE注意力
         self.se_attention_QOE = SELayer(
-            len(category_feature_num(feature_category_num_dict, self.feature_column_dict['history_QOE_continue'])) + len(
+            len(category_feature_num(feature_category_num_dict,
+                                     self.feature_column_dict['history_QOE_continue'])) + len(
                 category_feature_num(feature_category_num_dict, feature_column_dict['history_QOE_discrete'])))
         self.se_attention_CHONGHE = SELayer(
             len(category_feature_num(feature_category_num_dict, feature_column_dict['history_CHONGHE_continue'])) + len(
@@ -202,11 +204,11 @@ class HistoryDimScalingLayer(nn.Module):
         user_history_CHONGHE_vec = user_history_CHONGHE_vec.reshape(-1, max_history_len, feature_dim)
         user_history_FUFEI_vec = user_history_FUFEI_vec.reshape(-1, max_history_len, feature_dim)
         # (样本数*特征数，200）
-        mutli_QOE_weight, multi_user_history_QOE_vec, _ = self.multi_head_attention(user_history_QOE_vec,
+        multi_QOE_weight, multi_user_history_QOE_vec, _ = self.multi_head_attention(user_history_QOE_vec,
                                                                                     mask=pay_QOE_mask)
-        mutli_CHONGHE_weight, multi_user_history_CHONGHE_vec, _ = self.multi_head_attention(user_history_CHONGHE_vec,
+        multi_CHONGHE_weight, multi_user_history_CHONGHE_vec, _ = self.multi_head_attention(user_history_CHONGHE_vec,
                                                                                             mask=pay_CHONGHE_mask)
-        mutli_FUFEI_weight, multi_user_history_FUFEI_vec, _ = self.multi_head_attention(user_history_FUFEI_vec,
+        multi_FUFEI_weight, multi_user_history_FUFEI_vec, _ = self.multi_head_attention(user_history_FUFEI_vec,
                                                                                         mask=pay_FUFEI_mask)
         # (样本数,特征数，200）
         multi_user_history_QOE_vec = multi_user_history_QOE_vec.view(-1, user_history_QOE_temp_dim, feature_dim)
@@ -224,9 +226,9 @@ class HistoryDimScalingLayer(nn.Module):
         se_FUFEI_weight, se_user_history_FUFEI_vec, _ = self.se_attention_FUFEI(multi_user_history_FUFEI_vec)
 
         HistoryDimScaling_Weight_Result = {
-            'mutli_QOE_weight': mutli_QOE_weight,
-            'mutli_CHONGHE_weight': mutli_CHONGHE_weight,
-            'mutli_FUFEI_weight': mutli_FUFEI_weight,
+            'mutli_QOE_weight': multi_QOE_weight,
+            'mutli_CHONGHE_weight': multi_CHONGHE_weight,
+            'mutli_FUFEI_weight': multi_FUFEI_weight,
             'se_QOE_weight': se_QOE_weight,
             'se_CHONGHE_weight': se_CHONGHE_weight,
             'se_FUFEI_weight': se_FUFEI_weight
@@ -236,7 +238,7 @@ class HistoryDimScalingLayer(nn.Module):
 
 # 目标产品embedding SE  (batch, 1, feature_num, feature_dim)->(batch, 1，feature_dim)
 class TargetDimScalingLayer(nn.Module):
-    def __init__(self, feature_dim, feature_category_num_dict,feature_column_dict):
+    def __init__(self, feature_dim, feature_category_num_dict, feature_column_dict):
         super(TargetDimScalingLayer, self).__init__()
         # SE注意力
         self.se_attention_QOE = SELayer(
@@ -281,8 +283,7 @@ class History_Target_AttentionLayer(nn.Module):
         self.target_history_pay_feature_pianhao_FUFEI_layer = MultiHeadHistory_TargetAttention(num_heads, feature_dim)
 
     def forward(self, se_user_history_pay_QOE_vec, se_user_history_pay_CHONGHE_vec, se_user_history_pay_FUFEI_vec,
-                se_target_QOE_vec, se_target_CHONGHE_vec, se_target_FUFEI_vec, pay_QOE_mask=None, pay_CHONGHE_mask=None,
-                pay_FUFEI_mask=None):
+                se_target_QOE_vec, se_target_CHONGHE_vec, se_target_FUFEI_vec):
         # 将QOE、CHONGHE、FUFEI分别做attention
         # 对目标特征求对历史特征的偏好   (batch, 1，feature_dim)输出
         target_history_pay_attention_QOE_weight, target_history_pay_attention_QOE_vec = self.target_history_pay_feature_pianhao_QOE_layer(

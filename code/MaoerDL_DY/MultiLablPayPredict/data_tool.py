@@ -126,3 +126,59 @@ class DataTool(object):
             result_df = intput_data_df[intput_data_df[intput_data_df.columns[0]] == user_id]
             data_hash[user_id] = result_df  # 直接存储DataFrame对象  
         return data_hash
+
+    @staticmethod
+    # 划分数据集 给定输出后固定结果 输出形式定为存储user_id 形成train_dataset,val_dataset,test_dataset
+    def split_data_unique(input_train_file, input_test_file, output_file, val_ratio, test_ratio):
+        train_df = pd.read_csv(input_train_file)
+        test_df = pd.read_csv(input_test_file)
+        train_data = train_df[train_df.columns[0]].unique()  # 提取第一列数据并去重{user_id}
+        test_data = test_df[test_df.columns[0]].unique()
+        np.random.shuffle(train_data)  # 随机打乱训练数据
+
+        test_df_0 = test_df[test_df['pay_DL'] == 0]
+        test_df_1 = test_df[test_df['pay_DL'] == 1]
+
+        len_0 = len(test_df_0)
+        len_1 = len(test_df_1)
+
+        val_df_0_sample = test_df_0.sample(n=round(len_0*(val_ratio/(val_ratio+test_ratio))))
+        val_df_1_sample = test_df_1.sample(n=round(len_1*(val_ratio/(val_ratio+test_ratio))))
+
+        val_df = pd.concat([val_df_0_sample, val_df_1_sample])
+        val_data = val_df[val_df.columns[0]].unique()
+        test_df = pd.concat([test_df_0.drop(val_df_0_sample.index), test_df_1.drop(val_df_1_sample.index)])
+        test_data = test_df[test_df.columns[0]].unique()
+
+        for _ in range(10):
+            np.random.shuffle(test_data)
+            np.random.shuffle(val_data)
+
+        # 存储结果是去重的user_id
+        result = {
+            'Train': train_data,
+            'Val': val_data,
+            'Test': test_data
+        } 
+        # 创建每个子集的DataFrame  
+        train_df = pd.DataFrame(train_data, columns=['Train'])
+        val_df = pd.DataFrame(val_data, columns=['Val'])
+        test_df = pd.DataFrame(test_data, columns=['Test'])
+        # 将每个DataFrame转换为一列Series  
+        train_series = train_df.iloc[:, 0]
+        val_series = val_df.iloc[:, 0]
+        test_series = test_df.iloc[:, 0]
+        # 为了确保所有Series有相同的长度，我们需要找到最大长度并截断较短的Series  
+        max_len = max(len(train_series), len(val_series), len(test_series))
+        train_series = train_series.reindex(range(max_len)).fillna(value=pd.NA)
+        val_series = val_series.reindex(range(max_len)).fillna(value=pd.NA)
+        test_series = test_series.reindex(range(max_len)).fillna(value=pd.NA)
+        # 创建一个新的DataFrame，将Series作为列  
+        combined_df = pd.DataFrame({
+            'Train': train_series,
+            'Val': val_series,
+            'Test': test_series
+        })
+        # 写入CSV文件，不包含索引和列名  
+        combined_df.to_csv(output_file, index=False)
+        print('已输出划分数据集结果')

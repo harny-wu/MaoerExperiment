@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,9 +11,9 @@ from _collections import OrderedDict  # 导入 OrderedDict 来保持字典中键
 
 from torch import device
 
-import config
-from layer.common import dense_layer_noReLu
-from layer.embedding import UserPayHistoryEmbedding, TargetEmbedding, HistoryDimScalingLayer, \
+from MultiLablPayPredict.config import batch_size
+from MultiLablPayPredict.layer.common import dense_layer_noReLu
+from MultiLablPayPredict.layer.embedding import UserPayHistoryEmbedding, TargetEmbedding, HistoryDimScalingLayer, \
     TargetDimScalingLayer, History_Target_AttentionLayer
 
 
@@ -30,8 +31,8 @@ class MatchingModel(nn.Module):
 
         # User History & Target Attention层
         self.history_pay_attention_layer = HistoryDimScalingLayer(num_heads, feature_dim, feature_category_num_dict,
-                                                                  max_history_len,feature_column_dict)
-        self.target_attention_layer = TargetDimScalingLayer(feature_dim, feature_category_num_dict,feature_column_dict)
+                                                                  max_history_len, feature_column_dict)
+        self.target_attention_layer = TargetDimScalingLayer(feature_dim, feature_category_num_dict, feature_column_dict)
 
         # Target History Attention层
         self.target_history_attention_layer = History_Target_AttentionLayer(num_heads, feature_dim)
@@ -44,42 +45,70 @@ class MatchingModel(nn.Module):
         # MLP
         self.pay_vec_MLP_layer = dense_layer_noReLu(final_dim, 1)
 
-    def forward(self, batch_feature_tensor_pay_QOE_discrete, batch_feature_tensor_pay_CHONGHE_discrete,
+    def forward(self,
+                batch_feature_tensor_pay_QOE_discrete,
+                batch_feature_tensor_pay_CHONGHE_discrete,
                 batch_feature_tensor_pay_FUFEI_discrete,
-                batch_feature_tensor_pay_QOE_continue, batch_feature_tensor_pay_CHONGHE_continue,
+                batch_feature_tensor_pay_QOE_continue,
+                batch_feature_tensor_pay_CHONGHE_continue,
                 batch_feature_tensor_pay_FUFEI_continue,
-                batch_feature_tensor_target_QOE_discrete, batch_feature_tensor_target_CHONGHE_discrete,
+
+                batch_feature_tensor_target_QOE_discrete,
+                batch_feature_tensor_target_CHONGHE_discrete,
                 batch_feature_tensor_target_FUFEI_discrete,
-                batch_feature_tensor_target_QOE_continue, batch_feature_tensor_target_CHONGHE_continue,
+                batch_feature_tensor_target_QOE_continue,
+                batch_feature_tensor_target_CHONGHE_continue,
                 batch_feature_tensor_target_FUFEI_continue,
-                batch_feature_tensor_pay_QOE_discrete_mask, batch_feature_tensor_pay_CHONGHE_discrete_mask,
+
+                batch_feature_tensor_pay_QOE_discrete_mask,
+                batch_feature_tensor_pay_CHONGHE_discrete_mask,
                 batch_feature_tensor_pay_FUFEI_discrete_mask,
-                batch_feature_tensor_pay_QOE_continue_mask, batch_feature_tensor_pay_CHONGHE_continue_mask,
+                batch_feature_tensor_pay_QOE_continue_mask,
+                batch_feature_tensor_pay_CHONGHE_continue_mask,
                 batch_feature_tensor_pay_FUFEI_continue_mask,
+
                 label_tensor):
         # Embedding层
-        user_history_pay_QOE_vec, user_history_pay_CHONGHE_vec, user_history_pay_FUFEI_vec = self.user_history_pay_embedding_layer(
-            batch_feature_tensor_pay_QOE_discrete, batch_feature_tensor_pay_CHONGHE_discrete,
-            batch_feature_tensor_pay_FUFEI_discrete, batch_feature_tensor_pay_QOE_continue,
-            batch_feature_tensor_pay_CHONGHE_continue, batch_feature_tensor_pay_FUFEI_continue)
-        target_QOE_vec, target_CHONGHE_vec, target_FUFEI_vec = self.target_embedding_layer(
-            batch_feature_tensor_target_QOE_discrete, batch_feature_tensor_target_CHONGHE_discrete,
-            batch_feature_tensor_target_FUFEI_discrete, batch_feature_tensor_target_QOE_continue,
-            batch_feature_tensor_target_CHONGHE_continue, batch_feature_tensor_target_FUFEI_continue)
+        user_history_pay_QOE_vec, user_history_pay_CHONGHE_vec, user_history_pay_FUFEI_vec = (
+            self.user_history_pay_embedding_layer(
+                batch_feature_tensor_pay_QOE_discrete,
+                batch_feature_tensor_pay_CHONGHE_discrete,
+                batch_feature_tensor_pay_FUFEI_discrete,
+                batch_feature_tensor_pay_QOE_continue,
+                batch_feature_tensor_pay_CHONGHE_continue,
+                batch_feature_tensor_pay_FUFEI_continue))
+
+        target_QOE_vec, target_CHONGHE_vec, target_FUFEI_vec = (
+            self.target_embedding_layer(
+                batch_feature_tensor_target_QOE_discrete,
+                batch_feature_tensor_target_CHONGHE_discrete,
+                batch_feature_tensor_target_FUFEI_discrete,
+                batch_feature_tensor_target_QOE_continue,
+                batch_feature_tensor_target_CHONGHE_continue,
+                batch_feature_tensor_target_FUFEI_continue))
+
         # print('user_history_pay_FUFEI_vec size=',user_history_pay_FUFEI_vec.size())
         # print('target_QOE_vec size=',target_QOE_vec.size())
         # User History & Target Attention层
         # 合并mask输入
         # print("Shape of mask tensor:", batch_feature_tensor_pay_QOE_discrete_mask.shape,batch_feature_tensor_pay_QOE_continue_mask.shape)
+
         pay_QOE_mask = torch.cat(
             (batch_feature_tensor_pay_QOE_discrete_mask, batch_feature_tensor_pay_QOE_continue_mask), dim=2)
+
         pay_CHONGHE_mask = torch.cat(
             (batch_feature_tensor_pay_CHONGHE_discrete_mask, batch_feature_tensor_pay_CHONGHE_continue_mask), dim=2)
+
         pay_FUFEI_mask = torch.cat(
             (batch_feature_tensor_pay_FUFEI_discrete_mask, batch_feature_tensor_pay_FUFEI_continue_mask), dim=2)
-        HistoryDimScaling_Weight_Result, se_user_history_pay_QOE_vec, se_user_history_pay_CHONGHE_vec, se_user_history_pay_FUFEI_vec = self.history_pay_attention_layer(
-            user_history_pay_QOE_vec, user_history_pay_CHONGHE_vec, user_history_pay_FUFEI_vec,
-            pay_QOE_mask=pay_QOE_mask, pay_CHONGHE_mask=pay_CHONGHE_mask, pay_FUFEI_mask=pay_FUFEI_mask)
+
+        HistoryDimScaling_Weight_Result, se_user_history_pay_QOE_vec, se_user_history_pay_CHONGHE_vec, se_user_history_pay_FUFEI_vec = (
+            self.history_pay_attention_layer(
+                user_history_pay_QOE_vec,
+                user_history_pay_CHONGHE_vec,
+                user_history_pay_FUFEI_vec,
+                pay_QOE_mask=pay_QOE_mask, pay_CHONGHE_mask=pay_CHONGHE_mask, pay_FUFEI_mask=pay_FUFEI_mask))
+
         TargetDimScaling_Weight_Result, se_target_QOE_vec, se_target_CHONGHE_vec, se_target_FUFEI_vec = self.target_attention_layer(
             target_QOE_vec, target_CHONGHE_vec, target_FUFEI_vec)
         # print('se_user_history_pay_QOE_vec size=', se_user_history_pay_QOE_vec.shape)
@@ -95,7 +124,7 @@ class MatchingModel(nn.Module):
         # user_info_vec = user_info_vec.squeeze(1)  # 使用 squeeze 函数移除大小为 1 的维度
         # FUFEI:(batch,3,200)->(batch,3*200)经过网络->(batch,200) + uer_info:(batch,featuer_user*200)经过网络->(batch,200) 叠加后-> (batch,400)
         # 维度转换 (batch,3,200)->(batch,feature*200)经过网络->(batch,200)
-        target_history_pay_attention_vec = target_history_pay_attention_vec.view(config.batch_size,
+        target_history_pay_attention_vec = target_history_pay_attention_vec.view(batch_size,
                                                                                  -1)  # 将张量 x 重塑为 (batch, 3*200)  使用 -1 作为自动计算的维度
         target_history_pay_attention_vec = self.target_dim_change(target_history_pay_attention_vec)
         # print('target_history_pay_attention_vec',target_history_pay_attention_vec)
@@ -127,6 +156,16 @@ class LossFunction(nn.Module):
         return loss
 
 
+class BPRLoss(nn.Module):
+    def __init__(self):
+        super(BPRLoss, self).__init__()
+
+    def forward(self, positive_scores, negative_scores):
+        # 计算正样本和负样本之间的分数差异
+        loss = -torch.log(torch.sigmoid(positive_scores - negative_scores))  # positive_scores自动进行广播
+        return torch.mean(loss)
+
+
 # 自动评估阈值，计算ACC 、 Precision 等评估指标
 def evaluate(y_true, y_pred, digits=4, cutoff='auto'):
     '''
@@ -144,12 +183,13 @@ def evaluate(y_true, y_pred, digits=4, cutoff='auto'):
     y_pred_t = [1 if i > cutoff else 0 for i in y_pred]
 
     evaluation = OrderedDict()
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred_t).ravel()
-    evaluation['auc'] = round(roc_auc_score(y_true, y_pred), digits)
+    # tn, fp, fn, tp = confusion_matrix(y_true, y_pred_t).ravel()
+    # evaluation['auc'] = round(roc_auc_score(y_true, y_pred), digits)
+    evaluation['auc'] = 0
     evaluation['acc'] = round(accuracy_score(y_true, y_pred_t), digits)
     evaluation['recall'] = round(recall_score(y_true, y_pred_t), digits)
     evaluation['precision'] = round(precision_score(y_true, y_pred_t), digits)
-    evaluation['specificity'] = round(tn / (tn + fp), digits)
+    # evaluation['specificity'] = round(tn / (tn + fp), digits)
     evaluation['F1'] = round(f1_score(y_true, y_pred_t), digits)
     evaluation['cutoff'] = cutoff
 
@@ -217,7 +257,9 @@ def WeightResult(HistoryDimScaling_Weight_Result, TargetDimScaling_Weight_Result
 
     return result
 
+
 # 7.模型训练 Trainging
+
 def model_training(model, train_loader, val_loader, lossfunction, optimizer, EPOCH, device):
     # 定义早停策略的参数
     best_val_loss = float('inf')  # 初始化最佳验证损失为正无穷
@@ -232,37 +274,55 @@ def model_training(model, train_loader, val_loader, lossfunction, optimizer, EPO
         val_time = 0
         for batch in train_loader:
             batch = [data.to(device) for data in batch]
-            batch_feature_tensor_pay_QOE_discrete, batch_feature_tensor_pay_CHONGHE_discrete, batch_feature_tensor_pay_FUFEI_discrete, \
-                batch_feature_tensor_pay_QOE_continue, batch_feature_tensor_pay_CHONGHE_continue, batch_feature_tensor_pay_FUFEI_continue, \
-                batch_feature_tensor_target_QOE_discrete, batch_feature_tensor_target_CHONGHE_discrete, batch_feature_tensor_target_FUFEI_discrete, \
-                batch_feature_tensor_target_QOE_continue, batch_feature_tensor_target_CHONGHE_continue, batch_feature_tensor_target_FUFEI_continue, \
-                batch_feature_tensor_pay_QOE_discrete_mask, batch_feature_tensor_pay_CHONGHE_discrete_mask, batch_feature_tensor_pay_FUFEI_discrete_mask, \
-                batch_feature_tensor_pay_QOE_continue_mask, batch_feature_tensor_pay_CHONGHE_continue_mask, batch_feature_tensor_pay_FUFEI_continue_mask, \
-                train_label_tensor = batch
+            (user_id_list_tensor,
+             batch_feature_tensor_pay_QOE_discrete,
+             batch_feature_tensor_pay_CHONGHE_discrete,
+             batch_feature_tensor_pay_FUFEI_discrete, \
+             batch_feature_tensor_pay_QOE_continue,
+             batch_feature_tensor_pay_CHONGHE_continue,
+             batch_feature_tensor_pay_FUFEI_continue, \
+             batch_feature_tensor_target_QOE_discrete,
+             batch_feature_tensor_target_CHONGHE_discrete,
+             batch_feature_tensor_target_FUFEI_discrete, \
+             batch_feature_tensor_target_QOE_continue,
+             batch_feature_tensor_target_CHONGHE_continue,
+             batch_feature_tensor_target_FUFEI_continue, \
+             batch_feature_tensor_pay_QOE_discrete_mask,
+             batch_feature_tensor_pay_CHONGHE_discrete_mask,
+             batch_feature_tensor_pay_FUFEI_discrete_mask, \
+             batch_feature_tensor_pay_QOE_continue_mask,
+             batch_feature_tensor_pay_CHONGHE_continue_mask,
+             batch_feature_tensor_pay_FUFEI_continue_mask, \
+             train_label_tensor) = batch
             for param in model.parameters():
                 param.requires_grad = True
             optimizer.zero_grad()
-            softmax_score, sigmoid_score, HistoryDimScaling_Weight_Result, TargetDimScaling_Weight_Result, \
-                target_history_pay_attention_QOE_weight, target_history_pay_attention_CHONGHE_weight, \
-                target_history_pay_attention_FUFEI_weight = model(batch_feature_tensor_pay_QOE_discrete,
-                                                                  batch_feature_tensor_pay_CHONGHE_discrete,
-                                                                  batch_feature_tensor_pay_FUFEI_discrete,
-                                                                  batch_feature_tensor_pay_QOE_continue,
-                                                                  batch_feature_tensor_pay_CHONGHE_continue,
-                                                                  batch_feature_tensor_pay_FUFEI_continue,
-                                                                  batch_feature_tensor_target_QOE_discrete,
-                                                                  batch_feature_tensor_target_CHONGHE_discrete,
-                                                                  batch_feature_tensor_target_FUFEI_discrete,
-                                                                  batch_feature_tensor_target_QOE_continue,
-                                                                  batch_feature_tensor_target_CHONGHE_continue,
-                                                                  batch_feature_tensor_target_FUFEI_continue,
-                                                                  batch_feature_tensor_pay_QOE_discrete_mask,
-                                                                  batch_feature_tensor_pay_CHONGHE_discrete_mask,
-                                                                  batch_feature_tensor_pay_FUFEI_discrete_mask,
-                                                                  batch_feature_tensor_pay_QOE_continue_mask,
-                                                                  batch_feature_tensor_pay_CHONGHE_continue_mask,
-                                                                  batch_feature_tensor_pay_FUFEI_continue_mask,
-                                                                  train_label_tensor)
+
+            (softmax_score,
+             sigmoid_score,
+             HistoryDimScaling_Weight_Result,
+             TargetDimScaling_Weight_Result,
+             target_history_pay_attention_QOE_weight,
+             target_history_pay_attention_CHONGHE_weight,
+             target_history_pay_attention_FUFEI_weight) = model(batch_feature_tensor_pay_QOE_discrete,
+                                                                batch_feature_tensor_pay_CHONGHE_discrete,
+                                                                batch_feature_tensor_pay_FUFEI_discrete,
+                                                                batch_feature_tensor_pay_QOE_continue,
+                                                                batch_feature_tensor_pay_CHONGHE_continue,
+                                                                batch_feature_tensor_pay_FUFEI_continue,
+                                                                batch_feature_tensor_target_QOE_discrete,
+                                                                batch_feature_tensor_target_CHONGHE_discrete,
+                                                                batch_feature_tensor_target_FUFEI_discrete,
+                                                                batch_feature_tensor_target_QOE_continue,
+                                                                batch_feature_tensor_target_CHONGHE_continue,
+                                                                batch_feature_tensor_target_FUFEI_continue,
+                                                                batch_feature_tensor_pay_QOE_discrete_mask,
+                                                                batch_feature_tensor_pay_CHONGHE_discrete_mask,
+                                                                batch_feature_tensor_pay_FUFEI_discrete_mask,
+                                                                batch_feature_tensor_pay_QOE_continue_mask,
+                                                                batch_feature_tensor_pay_CHONGHE_continue_mask,
+                                                                batch_feature_tensor_pay_FUFEI_continue_mask,
+                                                                train_label_tensor)
 
             # weight_result_dict = WeightResult(HistoryDimScaling_Weight_Result, TargetDimScaling_Weight_Result, target_history_pay_attention_QOE_weight,
             #            target_history_pay_attention_CHONGHE_weight,target_history_pay_attention_FUFEI_weight)
@@ -271,11 +331,10 @@ def model_training(model, train_loader, val_loader, lossfunction, optimizer, EPO
             # print('HistoryDimScaling_Weight_Result, TargetDimScaling_Weight_Result, target_history_pay_attention_weight',
             #      HistoryDimScaling_Weight_Result['mutli_QOE_weight'].shape, TargetDimScaling_Weight_Result['se_QOE_weight'].shape, target_history_pay_attention_weight.shape)
             # sigmoid
-            # print('sigmoid_score',sigmoid_score)
             sigmoid_score = sigmoid_score[:, 0]  # (样本数，1)
             train_label_tensor = train_label_tensor[:, 0].to(device)  # (样本数，1)
-            # train_label_tensor[train_label_tensor == 1] = 0
-            # train_label_tensor[train_label_tensor == 2] = 1
+            train_label_tensor[train_label_tensor == 1] = 0
+            train_label_tensor[train_label_tensor == 2] = 1
             # train_label_tensor = torch.where(train_label_tensor == 1, torch.tensor(0).to(device), torch.tensor(1).to(device))  # 使用 torch.where 将 1 映射为 0，将 2 映射为 1
             loss = lossfunction(sigmoid_score, train_label_tensor.float())
             # softmax
@@ -286,7 +345,7 @@ def model_training(model, train_loader, val_loader, lossfunction, optimizer, EPO
             loss.to(device)
 
             # loss回传检查
-            # for name, parms in model.named_parameters():	
+            # for name, parms in model.named_parameters():
             #     if parms.grad is not None:  # 检查梯度是否为None
             #         grad_mean = torch.mean(parms.grad)  # 计算梯度的均值
             #         print('-->name:', name, '-->grad_requirs:', parms.requires_grad, '-->grad_mean: {:.4f}'.format(grad_mean))
@@ -295,7 +354,7 @@ def model_training(model, train_loader, val_loader, lossfunction, optimizer, EPO
             loss.backward()
             optimizer.step()
             # print("=============更新之后===========")
-            # for name, parms in model.named_parameters():	
+            # for name, parms in model.named_parameters():
             #     if parms.grad is not None:  # 检查梯度是否为None
             #         grad_mean = torch.mean(parms.grad)  # 计算梯度的均值
             #         print('-->name:', name, '-->grad_requirs:', parms.requires_grad, '-->grad_mean: {:.4f}'.format(grad_mean))
@@ -327,7 +386,7 @@ def model_training(model, train_loader, val_loader, lossfunction, optimizer, EPO
                 val_time = 0
                 for batch_val in val_loader:  # 假设你有一个名为 val_loader 的验证集数据加载器
                     batch_val = [data.to(device) for data in batch_val]
-                    val_batch_feature_tensor_pay_QOE_discrete, val_batch_feature_tensor_pay_CHONGHE_discrete, val_batch_feature_tensor_pay_FUFEI_discrete, \
+                    val_user_id_list_tensor, val_batch_feature_tensor_pay_QOE_discrete, val_batch_feature_tensor_pay_CHONGHE_discrete, val_batch_feature_tensor_pay_FUFEI_discrete, \
                         val_batch_feature_tensor_pay_QOE_continue, val_batch_feature_tensor_pay_CHONGHE_continue, val_batch_feature_tensor_pay_FUFEI_continue, \
                         val_batch_feature_tensor_target_QOE_discrete, val_batch_feature_tensor_target_CHONGHE_discrete, val_batch_feature_tensor_target_FUFEI_discrete, \
                         val_batch_feature_tensor_target_QOE_continue, val_batch_feature_tensor_target_CHONGHE_continue, val_batch_feature_tensor_target_FUFEI_continue, \
@@ -356,13 +415,13 @@ def model_training(model, train_loader, val_loader, lossfunction, optimizer, EPO
                                                                               val_batch_feature_tensor_pay_FUFEI_continue_mask,
                                                                               val_label_tensor)
 
-                    # sigmoid                   
+                    # sigmoid
                     sigmoid_score_val = sigmoid_score_val[:, 0]  # (样本数，1)
                     sigmoid_score_val = sigmoid_score_val.cpu()  # .detach()  # 转为CPU
                     val_label_tensor = val_label_tensor[:, 0]  # (样本数，1)
                     val_label_tensor = val_label_tensor.cpu()
-                    # val_label_tensor[val_label_tensor == 1] = 0
-                    # val_label_tensor[val_label_tensor == 2] = 1
+                    val_label_tensor[val_label_tensor == 1] = 0
+                    val_label_tensor[val_label_tensor == 2] = 1
                     # val_label_tensor = torch.where(val_label_tensor == 1, torch.tensor(0), torch.tensor(1))  # 使用 torch.where 将 1 映射为 0，将 2 映射为 1
                     loss_val = lossfunction(sigmoid_score_val, val_label_tensor.float())
                     # softmax
@@ -411,8 +470,14 @@ def model_training(model, train_loader, val_loader, lossfunction, optimizer, EPO
                     print(f"早停策略触发，停止训练在第 {epoch} 个epoch.")
                     break
 
+
 # 模型测试 Test
-def test_model(model, test_loader):
+<<<<<<< HEAD
+def test_model(model, test_loader, lossfunction):
+=======
+
+def test_model(model, test_loader,lossF):
+>>>>>>> parent of 2a15153 (随手)
     model.eval()  # 设置模型为评估模式
     with torch.no_grad():  # 在评估模式下不计算梯度
         total_loss_test = 0.0
@@ -424,8 +489,8 @@ def test_model(model, test_loader):
         test_time = 0
         results = []  # 用于保存结果的列表
         for batch_test in test_loader:  # 假设你有一个名为 val_loader 的验证集数据加载器
-            batch_test = [data.to(device) for data in batch_test]
-            test_batch_feature_tensor_pay_QOE_discrete, test_batch_feature_tensor_pay_CHONGHE_discrete, test_batch_feature_tensor_pay_FUFEI_discrete, \
+            # batch_test = [data.to(device) for data in batch_test]
+            test_user_id_list_tensor, test_batch_feature_tensor_pay_QOE_discrete, test_batch_feature_tensor_pay_CHONGHE_discrete, test_batch_feature_tensor_pay_FUFEI_discrete, \
                 test_batch_feature_tensor_pay_QOE_continue, test_batch_feature_tensor_pay_CHONGHE_continue, test_batch_feature_tensor_pay_FUFEI_continue, \
                 test_batch_feature_tensor_target_QOE_discrete, test_batch_feature_tensor_target_CHONGHE_discrete, test_batch_feature_tensor_target_FUFEI_discrete, \
                 test_batch_feature_tensor_target_QOE_continue, test_batch_feature_tensor_target_CHONGHE_continue, test_batch_feature_tensor_target_FUFEI_continue, \
@@ -460,13 +525,17 @@ def test_model(model, test_loader):
             weight_result_dict = {key: torch.tensor(value).cpu() for key, value in weight_result_dict.items()}
             # sigmoid
             sigmoid_score_test = sigmoid_score_test[:, 0]  # (样本数，1)
-            sigmoid_score_test = sigmoid_score_test.cpu()  #.detach()  # 转为CPU
+            sigmoid_score_test = sigmoid_score_test.cpu()  # .detach()  # 转为CPU
             test_label_tensor = test_label_tensor[:, 0]  # (样本数，1)
             test_label_tensor = test_label_tensor.cpu()
-            # test_label_tensor[test_label_tensor == 1] = 0
-            # test_label_tensor[test_label_tensor == 2] = 1
+            test_label_tensor[test_label_tensor == 1] = 0
+            test_label_tensor[test_label_tensor == 2] = 1
             # test_label_tensor = torch.where(test_label_tensor == 1, torch.tensor(0), torch.tensor(1))  # 使用 torch.where 将 1 映射为 0，将 2 映射为 1
-            loss_test = LossFunction(sigmoid_score_test, test_label_tensor.float())
+<<<<<<< HEAD
+            loss_test = lossfunction(sigmoid_score_test, test_label_tensor.float())
+=======
+            loss_test = lossF(sigmoid_score_test, test_label_tensor.float())
+>>>>>>> parent of 2a15153 (随手)
             # softmax
             # softmax_score_test = softmax_score_test[:, 0]  # (样本数，1)
             # softmax_score_test = softmax_score_test.cpu()#.detach()  # 转为CPU
@@ -491,8 +560,14 @@ def test_model(model, test_loader):
             total_recall_test += evaluation['recall']
             total_precision_test += evaluation['precision']
             total_auc_test += evaluation['auc']
-
+            for i in range(len(test_label_tensor)):
+                results.append({
+                    "user_id": test_user_id_list_tensor[i],
+                    "label": test_label_tensor[i],
+                    "score": sigmoid_score_test[i]
+                })
             test_time += 1
+
             print('||--测试：----------', test_time, '个batch运行时间：', datetime.datetime.now(), '-------------')
         # 平均损失
         average_loss_test = total_loss_test / len(test_loader)
@@ -501,6 +576,40 @@ def test_model(model, test_loader):
         average_f1_test = total_f1_test / len(test_loader)
         average_precision_test = total_precision_test / len(test_loader)
         average_recall_test = total_recall_test / len(test_loader)
+
+        # 将结果列表转换为DataFrame
+        df_results = pd.DataFrame(results)
+        df_results['user_id'] = df_results['user_id'].apply(lambda x: x.item())
+        df_results['score'] = df_results['score'].apply(lambda x: x.item())
+        df_results['label'] = df_results['label'].apply(lambda x: x.item())
+
         print(
             f"Test Loss: {average_loss_test},AUC: {average_auc_test},ACC:{average_acc_test},F1:{average_f1_test},Precision:{average_precision_test},Recall:{average_recall_test}")
         return average_loss_test, average_auc_test, average_acc_test, average_f1_test, average_precision_test, average_recall_test, weight_result_dict
+
+
+# top-n
+def top_evaluation(df_results, n):
+    # 初始化结果列表
+    ndcg_list = []
+    hr_list = []
+
+    for user_id, user_group in df_results.groupby('pos_comment_id'):
+        user_group = user_group.sort_values(by='sum_score', ascending=False)  # 按分数降序排序
+        top_items = user_group.head(n)['label'].tolist()  # 选取前n个的标签
+        true_labels = user_group['label'].tolist()  # 用户所有候选物品的真实标签
+
+        # 计算NDCG
+        idcg = sorted(true_labels, reverse=True)[:n]  # 理想情况下的DCG
+        dcg = sum(rel / np.log(i + 2) for i, rel in enumerate(top_items))  # 计算DCG
+        ndcg = dcg / sum(rel / np.log(i + 2) for i, rel in enumerate(idcg))  # 计算NDCG
+        ndcg_list.append(ndcg)
+        # 计算HR@N
+        hit_rate = 1 if any(label == 1 for label in top_items) else 0  # 若Top N中有真实正样本，HR@N为1，否则为0
+        hr_list.append(hit_rate)
+
+    # 计算平均值
+    average_ndcg = np.mean(ndcg_list)
+    average_hr = np.mean(hr_list)
+
+    return average_ndcg, average_hr
