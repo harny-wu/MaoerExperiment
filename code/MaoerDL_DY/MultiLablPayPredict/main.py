@@ -34,7 +34,7 @@ class TensorDatasettoDict(Dataset):
 
 if __name__ == '__main__':
     data_time_windows = '0101_0131'
-    data_path = "/Users/daidaiwu/学校/大论文/MaoerExperiment/code/MaoerDL_DY/maoer/DataSet/"
+    data_path = "D:/academic\MaoerExperiment\code\MaoerDL_DY\maoer\DataSet/"
     # path = './Dataset/' + data_time_windows + '_user_pay_pred_feature_deal.csv'
     train_path = data_path + data_time_windows + '_all_feature_FS_deal.csv'
     test_path = data_path + data_time_windows + '_all_feature_DL_deal.csv'

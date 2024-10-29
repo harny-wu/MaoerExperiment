@@ -11,11 +11,6 @@ num_tasks = 2
 continue_embedding_dim = 200
 discrete_embedding_dim = 200
 lr = 0.1
-<<<<<<< HEAD
 batch_size = 10
 threshold = 0.5
 debug_sample_size = 10
-=======
-batch_size = 128
-threshold = 0.5
->>>>>>> parent of 2a15153 (随手)

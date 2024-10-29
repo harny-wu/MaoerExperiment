@@ -1,9 +1,11 @@
 import torch
 from torch import nn
 
-from MultiLablPayPredict.config import max_history_len, feature_dim
-from MultiLablPayPredict.layer.basic_attention import MultiHeadSelfAttention, MultiHeadHistory_TargetAttention
-from MultiLablPayPredict.layer.common import discrete_embedding, continuous_embedding, category_feature_num, SELayer
+
+from config import max_history_len, feature_dim
+from layer.basic_attention import MultiHeadSelfAttention, MultiHeadHistory_TargetAttention
+from layer.common import discrete_embedding, continuous_embedding, category_feature_num, SELayer
+
 
 
 # user_history_feature 对于一个user的多个历史行为，将其拼接成一维向量 要先经过一层通道注意力机制得到最后结果

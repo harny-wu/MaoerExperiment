@@ -11,9 +11,9 @@ from _collections import OrderedDict  # 导入 OrderedDict 来保持字典中键
 
 from torch import device
 
-from MultiLablPayPredict.config import batch_size
-from MultiLablPayPredict.layer.common import dense_layer_noReLu
-from MultiLablPayPredict.layer.embedding import UserPayHistoryEmbedding, TargetEmbedding, HistoryDimScalingLayer, \
+import config
+from layer.common import dense_layer_noReLu
+from layer.embedding import UserPayHistoryEmbedding, TargetEmbedding, HistoryDimScalingLayer, \
     TargetDimScalingLayer, History_Target_AttentionLayer
 
 
@@ -124,7 +124,7 @@ class MatchingModel(nn.Module):
         # user_info_vec = user_info_vec.squeeze(1)  # 使用 squeeze 函数移除大小为 1 的维度
         # FUFEI:(batch,3,200)->(batch,3*200)经过网络->(batch,200) + uer_info:(batch,featuer_user*200)经过网络->(batch,200) 叠加后-> (batch,400)
         # 维度转换 (batch,3,200)->(batch,feature*200)经过网络->(batch,200)
-        target_history_pay_attention_vec = target_history_pay_attention_vec.view(batch_size,
+        target_history_pay_attention_vec = target_history_pay_attention_vec.view(config.batch_size,
                                                                                  -1)  # 将张量 x 重塑为 (batch, 3*200)  使用 -1 作为自动计算的维度
         target_history_pay_attention_vec = self.target_dim_change(target_history_pay_attention_vec)
         # print('target_history_pay_attention_vec',target_history_pay_attention_vec)
@@ -472,12 +472,7 @@ def model_training(model, train_loader, val_loader, lossfunction, optimizer, EPO
 
 
 # 模型测试 Test
-<<<<<<< HEAD
-def test_model(model, test_loader, lossfunction):
-=======
-
-def test_model(model, test_loader,lossF):
->>>>>>> parent of 2a15153 (随手)
+def test_model(model, test_loader, lossF):
     model.eval()  # 设置模型为评估模式
     with torch.no_grad():  # 在评估模式下不计算梯度
         total_loss_test = 0.0
@@ -531,11 +526,8 @@ def test_model(model, test_loader,lossF):
             test_label_tensor[test_label_tensor == 1] = 0
             test_label_tensor[test_label_tensor == 2] = 1
             # test_label_tensor = torch.where(test_label_tensor == 1, torch.tensor(0), torch.tensor(1))  # 使用 torch.where 将 1 映射为 0，将 2 映射为 1
-<<<<<<< HEAD
-            loss_test = lossfunction(sigmoid_score_test, test_label_tensor.float())
-=======
             loss_test = lossF(sigmoid_score_test, test_label_tensor.float())
->>>>>>> parent of 2a15153 (随手)
+
             # softmax
             # softmax_score_test = softmax_score_test[:, 0]  # (样本数，1)
             # softmax_score_test = softmax_score_test.cpu()#.detach()  # 转为CPU

@@ -2,7 +2,7 @@ import math
 
 from torch import nn
 
-
+# 3.基础模型 embedding、attention
 # 构建离散特征的embedding
 def discrete_embedding(feature_category_num_dict, feature_column_name_list, embedding_dim):  # 输入特征取值大小的集合,特征数,维度
     # 创建一个列表来存储每个嵌入层
